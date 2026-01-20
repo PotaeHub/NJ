@@ -3,11 +3,11 @@ import { ref, onMounted } from "vue"
 import api from "@/services/api"
 import GameFormModal from "@/components/admin/GameFormModal.vue"
 import DeleteConfirmModal from "../../components/admin/users/DeleteConfirmModal.vue"
+import { Plus, LayoutGrid, Trash2, Edit3, Image as ImageIcon } from 'lucide-vue-next'
 
 const games = ref([])
 const loading = ref(false)
 const BACKEND_URL = import.meta.env.VITE_BACKEND
-
 
 const showModal = ref(false)
 const showDeletePopup = ref(false)
@@ -35,16 +35,13 @@ const openEdit = (game) => {
     showModal.value = true
 }
 
-
 const handleDeleteClick = (game) => {
     selectedGame.value = game
     showDeletePopup.value = true
 }
 
-
 const onConfirmDelete = async () => {
     if (!selectedGame.value) return
-
     try {
         await api.delete(`/admin/games/${selectedGame.value.id}`)
         showDeletePopup.value = false
@@ -59,168 +56,158 @@ onMounted(loadGames)
 </script>
 
 <template>
-    <div class="p-8 max-w-7xl mx-auto space-y-8 min-h-screen bg-slate-50/50">
+    <div
+        class="min-h-screen bg-[#FDFDFD] text-black font-sans selection:bg-black selection:text-white p-6 lg:p-12 space-y-12">
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-                    <span class="p-2 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                        </svg>
-                    </span>
-                    Game Inventory
-                </h1>
-                <p class="text-slate-500 mt-1 ml-1">Manage your digital assets and pricing</p>
+        <header
+            class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-zinc-100 pb-10">
+            <div class="space-y-1">
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="p-3 bg-black text-white rounded-2xl shadow-xl shadow-black/10">
+                        <LayoutGrid :size="28" stroke-width="2.5" />
+                    </div>
+                    <h1 class="text-4xl font-black tracking-tighter uppercase">Inventory</h1>
+                </div>
+                <div class="h-1 w-12 bg-black ml-1"></div>
+                <p class="text-zinc-400 text-sm font-medium tracking-wide ml-1 uppercase">Asset & Stock Distribution
+                    Center</p>
             </div>
 
             <button @click="openCreate"
-                class="group flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-                </svg>
-                Add New Game
+                class="group flex items-center gap-3 bg-black text-white font-black px-8 py-4 rounded-2xl shadow-2xl shadow-black/20 transition-all active:scale-95 hover:bg-zinc-800 tracking-widest text-[10px] uppercase">
+                <Plus class="h-4 w-4 transition-transform group-hover:rotate-90" stroke-width="3" />
+                Register New Asset
             </button>
-        </div>
+        </header>
 
-        <div class="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden relative">
+        <div
+            class="bg-white rounded-[2.5rem] border border-zinc-100 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] overflow-hidden relative">
 
-            <div v-if="loading"
-                class="absolute inset-0 z-20 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                <div class="flex flex-col items-center gap-3">
-                    <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin">
+            <Transition name="fade">
+                <div v-if="loading"
+                    class="absolute inset-0 z-20 bg-white/80 backdrop-blur-md flex items-center justify-center">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="w-10 h-10 border-[3px] border-black border-t-transparent rounded-full animate-spin">
+                        </div>
+                        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-black">Syncing
+                            Database</span>
                     </div>
-                    <span class="text-indigo-600 font-bold animate-pulse uppercase tracking-widest text-xs">Loading
-                        Games...</span>
                 </div>
-            </div>
+            </Transition>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50/50 border-b border-slate-100">
-                            <th class="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Media
-                                Preview</th>
-                            <th class="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400">Game
-                                Information</th>
+                        <tr class="bg-zinc-50/50 border-b border-zinc-100">
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Media
+                            </th>
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                                Identity</th>
                             <th
-                                class="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-center">
-                                Price</th>
+                                class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-center">
+                                Valuation</th>
                             <th
-                                class="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-center">
+                                class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-center">
                                 Stock</th>
                             <th
-                                class="px-6 py-5 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-center">
+                                class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-center">
                                 Status</th>
-                            <th class="px-6 py-5 text-right text-slate-400 uppercase text-[11px]">Actions</th>
+                            <th
+                                class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-right">
+                                Commands</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-slate-50">
-                        <tr v-for="g in games" :key="g.id" class="hover:bg-slate-50/50 transition-colors group">
+                    <tbody class="divide-y divide-zinc-50">
+                        <tr v-for="g in games" :key="g.id"
+                            class="group hover:bg-zinc-50/50 transition-all duration-300">
 
-                            <td class="px-6 py-5">
-                                <div v-if="g.gameMedias?.length" class="flex -space-x-4">
+                            <td class="px-8 py-6">
+                                <div v-if="g.gameMedias?.length"
+                                    class="flex -space-x-3 group-hover:space-x-1 transition-all duration-500">
                                     <div v-for="(img, idx) in g.gameMedias.filter(m => m.type === 'IMAGE').slice(0, 3)"
-                                        :key="img.id" class="relative transition-transform group-hover:translate-x-1"
-                                        :style="{ zIndex: 10 - idx }">
+                                        :key="img.id" class="relative" :style="{ zIndex: 10 - idx }">
                                         <img :src="BACKEND_URL + img.url"
-                                            class="w-14 h-14 object-cover rounded-2xl border-4 border-white shadow-sm ring-1 ring-slate-100" />
+                                            class="w-14 h-14 object-cover rounded-xl border-2 border-white shadow-md ring-1 ring-zinc-100 group-hover:scale-105 transition-transform" />
                                     </div>
                                     <div v-if="g.gameMedias.length > 3"
-                                        class="w-14 h-14 rounded-2xl bg-slate-100 border-4 border-white flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm z-0">
+                                        class="w-14 h-14 rounded-xl bg-black border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-md">
                                         +{{ g.gameMedias.length - 3 }}
                                     </div>
                                 </div>
                                 <div v-else
-                                    class="w-14 h-14 rounded-2xl bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
+                                    class="w-14 h-14 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-300">
+                                    <ImageIcon :size="20" />
                                 </div>
                             </td>
 
-                            <td class="px-6 py-5">
+                            <td class="px-8 py-6">
                                 <div class="flex flex-col">
                                     <span
-                                        class="text-base font-bold text-slate-700 leading-tight group-hover:text-indigo-600 transition-colors">{{
-                                            g.title }}</span>
-                                    <span class="text-xs text-slate-400 mt-1">Ref ID: #{{ g.id.toString().slice(-6)
-                                        }}</span>
+                                        class="text-base font-black tracking-tight text-zinc-800 group-hover:text-black transition-colors">
+                                        {{ g.title }}
+                                    </span>
+                                    <span
+                                        class="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest leading-none">
+                                        SKU-{{ g.id.toString().slice(-6).toUpperCase() }}
+                                    </span>
                                 </div>
                             </td>
 
-                            <td class="px-6 py-5 text-center">
-                                <span
-                                    class="inline-block px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-mono font-bold text-sm border border-indigo-100">
+                            <td class="px-8 py-6 text-center">
+                                <span class="text-sm font-black tracking-tighter">
                                     ฿{{ g.price.toLocaleString() }}
                                 </span>
                             </td>
 
-                            <td class="px-6 py-5 text-center">
+                            <td class="px-8 py-6 text-center">
                                 <div class="flex flex-col items-center">
-                                    <span
-                                        :class="g.stock <= 5 ? 'text-rose-500 font-black underline decoration-2' : 'text-slate-600 font-semibold'"
-                                        class="text-sm">
+                                    <span :class="g.stock <= 5 ? 'text-red-500 font-black' : 'text-zinc-600 font-bold'"
+                                        class="text-sm leading-none">
                                         {{ g.stock }}
                                     </span>
-                                    <span class="text-[9px] uppercase tracking-tighter text-slate-400">units</span>
+                                    <span
+                                        class="text-[8px] font-black uppercase tracking-widest text-zinc-300 mt-1">Units
+                                        Available</span>
                                 </div>
                             </td>
 
-                            <td class="px-6 py-5 text-center">
+                            <td class="px-8 py-6 text-center">
                                 <span :class="{
-                                    'bg-emerald-50 text-emerald-600 border-emerald-200': g.status === 'PUBLISHED',
-                                    'bg-slate-50 text-slate-400 border-slate-200': g.status === 'DRAFT',
-                                    'bg-rose-50 text-rose-500 border-rose-200': g.status === 'SOLD'
+                                    'bg-black text-white border-black': g.status === 'PUBLISHED',
+                                    'bg-white text-zinc-400 border-zinc-200': g.status === 'DRAFT',
+                                    'bg-zinc-100 text-zinc-800 border-zinc-300': g.status === 'SOLD'
                                 }"
-                                    class="px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-widest">
+                                    class="px-3 py-1.5 rounded-lg text-[9px] font-black border uppercase tracking-[0.15em] inline-block min-w-[90px]">
                                     {{ g.status }}
                                 </span>
                             </td>
 
-                            <td class="px-6 py-5 text-right">
-                                <div class="flex justify-end gap-2">
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex justify-end gap-4">
                                     <button @click="openEdit(g)"
-                                        class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                        title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
+                                        class="p-2 text-zinc-300 hover:text-black transition-colors"
+                                        title="Modify Asset">
+                                        <Edit3 :size="18" stroke-width="2.5" />
                                     </button>
                                     <button @click="handleDeleteClick(g)"
-                                        class="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                                        title="Delete">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+                                        class="p-2 text-zinc-200 hover:text-red-500 transition-colors"
+                                        title="Decommission">
+                                        <Trash2 :size="18" stroke-width="2.5" />
                                     </button>
                                 </div>
                             </td>
                         </tr>
 
                         <tr v-if="games.length === 0 && !loading">
-                            <td colspan="6" class="px-6 py-24 text-center">
-                                <div class="flex flex-col items-center opacity-40">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-300" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path
-                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                                            stroke-width="1.5" />
-                                    </svg>
-                                    <p class="mt-4 font-bold text-slate-400 uppercase tracking-widest text-xs">No games
-                                        found in your inventory</p>
+                            <td colspan="6" class="px-8 py-32 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div
+                                        class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mb-6">
+                                        <LayoutGrid :size="32" class="text-zinc-200" />
+                                    </div>
+                                    <p class="font-black text-zinc-300 uppercase tracking-[0.3em] text-[10px]">Vault is
+                                        currently empty</p>
                                 </div>
                             </td>
                         </tr>
@@ -228,10 +215,42 @@ onMounted(loadGames)
                 </table>
             </div>
         </div>
+
+        <DeleteConfirmModal :show="showDeletePopup" :itemName="selectedGame?.title" @close="showDeletePopup = false"
+            @confirm="onConfirmDelete" />
+        <GameFormModal :show="showModal" :game="selectedGame" @close="showModal = false" @success="loadGames" />
     </div>
-
-
-    <DeleteConfirmModal :show="showDeletePopup" :itemName="selectedGame?.title" @close="showDeletePopup = false"
-        @confirm="onConfirmDelete" />
-    <GameFormModal :show="showModal" :game="selectedGame" @close="showModal = false" @success="loadGames" />
 </template>
+
+<style scoped>
+@import "tailwindcss";
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+/* Custom Scrollbar สำหรับ Table */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e4e4e7;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #18181b;
+}
+</style>

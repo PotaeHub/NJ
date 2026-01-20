@@ -10,6 +10,6 @@ router.get('/games', getGames)
 router.get('/games/:id', getGameById)
 router.get('/games/:id/ownership', checkOwnership)
 router.post('/', auth, Roles('SELLER'), createGame)
-
+router.get('/admin/games', auth, Roles('ADMIN'), getGames)
 
 export default router
