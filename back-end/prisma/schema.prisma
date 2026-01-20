@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(BUYER)
+  avatar    String?
+  games     Game[]   @relation("SellerGames")
+  orders    Order[]  @relation("BuyerOrders")
+  tokens    Token[]
+  reviews   Review[]
+  banned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  token     String
+  type      TokenType
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}
+
+model Game {
+  id          Int         @id @default(autoincrement())
+  sellerId    Int
+  seller      User        @relation("SellerGames", fields: [sellerId], references: [id])
+  title       String
+  description String
+  price       Float
+  stock       Int
+  status      GameStatus  @default(PUBLISHED)
+  coverImage  String?
+  video       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  gameMedias  GameMedia[]
+  orderItems  OrderItem[]
+  reviews     Review[]
+}
+
+model GameMedia {
+  id        Int       @id @default(autoincrement())
+  gameId    Int
+  game      Game      @relation(fields: [gameId], references: [id])
+  type      MediaType
+  url       String
+  createdAt DateTime  @default(now())
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  buyerId    Int
+  buyer      User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  totalPrice Float
+  status     OrderStatus @default(PENDING)
+  items      OrderItem[]
+  createdAt  DateTime    @default(now())
+}
+
+model OrderItem {
+  id       Int   @id @default(autoincrement())
+  orderId  Int
+  gameId   Int
+  price    Float
+  quantity Int
+  order    Order @relation(fields: [orderId], references: [id])
+  game     Game  @relation(fields: [gameId], references: [id])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  gameId    Int
+  rating    Int
+  comment   String?
+  user      User     @relation(fields: [userId], references: [id])
+  game      Game     @relation(fields: [gameId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gameId])
+}
+
+/**
+ * ENUMS
+ */
+enum Role {
+  ADMIN
+  SELLER
+  BUYER
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum GameStatus {
+  DRAFT
+  PUBLISHED
+  SOLD
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  COMPLETED
+}

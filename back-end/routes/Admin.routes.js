@@ -1,0 +1,40 @@
+import { Router } from 'express'
+import { auth } from '../middleware/auth.middleware.js'
+import { adminCancelOrder, adminCompleteOrder, adminGetOrderById, adminGetOrders, adminUpdateStatus, confirmPayment, createGame, createUser, deleteGame, deleteUser, getAdminDashboard, getAllGames, getOrders, getUsers, orderMy, toggleBanUser, updateGame, updateRole, updateUser } from '../controller/Admin.controller.js'
+import { Roles } from '../middleware/checkRole.js'
+import { uploadGameMedia } from '../middleware/upload.middleware.js'
+const router = Router()
+
+// Games
+router.post('/admin/games', auth, Roles("ADMIN"), uploadGameMedia.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 }
+]), createGame)
+
+router.get('/admin/games', auth, Roles("ADMIN"), getAllGames)
+
+router.put('/admin/games/:id', auth, Roles("ADMIN"), uploadGameMedia.fields([
+    { name: "image", maxCount: 1 },
+    { name: "video", maxCount: 1 }
+]), updateGame)
+
+router.delete('/admin/games/:id', auth, Roles("ADMIN"), deleteGame)
+
+// Dashboard
+router.get('/admin/dashboard', auth, Roles("ADMIN"), getAdminDashboard)
+// Users
+router.post('/admin/users', auth, Roles("ADMIN"), uploadGameMedia.single("avatar"), createUser)
+router.get('/admin/users', auth, Roles("ADMIN"), getUsers)
+router.put('/admin/users/:id', auth, Roles("ADMIN"), uploadGameMedia.single("avatar"), updateUser)
+router.put('/admin/users/:id/role', auth, Roles("ADMIN"), updateRole)
+router.put('/admin/users/:id/ban', auth, Roles("ADMIN"), toggleBanUser)
+router.delete('/admin/users/:id', auth, Roles("ADMIN"), deleteUser)
+
+// Orders
+router.get("/admin/orders", auth, Roles("ADMIN"), adminGetOrders)
+router.get("/admin/orders/:id", auth, Roles("ADMIN"), adminGetOrderById)
+router.patch("/admin/orders/:id/status", auth, Roles("ADMIN"), adminUpdateStatus)
+router.patch("/admin/orders/:id/complete", auth, Roles("ADMIN"), adminCompleteOrder)
+router.patch("/admin/orders/:id/cancel", auth, Roles("ADMIN"), adminCancelOrder)
+
+export default router
