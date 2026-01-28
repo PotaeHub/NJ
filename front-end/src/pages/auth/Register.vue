@@ -28,108 +28,125 @@ const submit = async () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden">
+    <div
+        class="min-h-screen bg-[#FDFDFD] flex items-center justify-center p-6 relative overflow-hidden font-sans selection:bg-black selection:text-white">
 
-        <div
-            class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 blur-[120px] rounded-full animate-pulse">
+        <!-- Background Decorative (Subtle Grey) -->
+        <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-zinc-100/80 blur-[120px] rounded-full">
         </div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-indigo-600/10 blur-[100px] rounded-full">
+        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-zinc-200/50 blur-[100px] rounded-full">
         </div>
 
-        <div class="w-full max-w-lg relative">
+        <div class="w-full max-w-[480px] relative">
+            <!-- Main Card Container -->
             <div
-                class="absolute inset-0 bg-white/[0.02] backdrop-blur-2xl rounded-[3rem] border border-white/10 shadow-2xl">
-            </div>
+                class="relative bg-white rounded-[2.5rem] border border-zinc-100 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.1)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.15)]">
 
-            <div class="relative p-10 md:p-12">
-                <div class="text-center mb-10">
-                    <div
-                        class="inline-block px-4 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-                        <span class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em]">
-                            รับสมัครสมาชิก</span>
-                    </div>
-                    <h2 class="text-3xl font-black text-white italic uppercase tracking-tighter">
-                        สร้าง <span class="text-emerald-400">บัญชั</span>
-                    </h2>
-                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-70">
-                        เข้าร่วมเครือข่ายเกม NJ
-                    </p>
-                </div>
+                <!-- Progress Bar Loading -->
+                <div v-if="loading" class="absolute top-0 left-0 h-[2px] bg-black animate-[loading_2s_infinite]"></div>
 
-                <div class="grid grid-cols-1 gap-5">
-
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Player
-                            Alias</label>
-                        <input v-model="username" type="text" placeholder="GamerTag_01"
-                            class="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all placeholder:text-slate-700 font-medium" />
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Comms Link
-                            (Email)</label>
-                        <input v-model="email" type="email" placeholder="commander@base.com"
-                            class="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all placeholder:text-slate-700 font-medium" />
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Secure
-                            Protocol (Password)</label>
-                        <input v-model="password" type="password" placeholder="••••••••"
-                            class="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all placeholder:text-slate-700 font-medium" />
-                    </div>
-
-                    <p
-                        class="text-[9px] text-slate-500 font-bold text-center leading-relaxed px-4 uppercase tracking-tighter">
-                        เมื่อดำเนินการต่อ<span class="text-slate-300">คุณยอมรับข้อกำหนดในการให้บริการ</span> และ
-                        <span class="text-slate-300">ระเบียบปฏิบัติด้านความเป็นส่วนตัว</span>.
-                    </p>
-
-                    <button @click="submit" :disabled="loading"
-                        class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] transition-all shadow-[0_0_25px_rgba(16,185,129,0.2)] active:scale-[0.98] relative overflow-hidden group mt-2">
-
-                        <span v-if="loading" class="flex items-center justify-center gap-3">
-                            <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
-                                    fill="none"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
-                            </svg>
-                            Processing...
-                        </span>
-                        <span v-else>Register Profile</span>
-
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700">
+                <div class="relative p-10 md:p-12">
+                    <!-- Header Section -->
+                    <div class="text-center mb-10">
+                        <div class="inline-block px-4 py-1 rounded-full bg-zinc-50 border border-zinc-200 mb-6">
+                            <span class=" text-zinc-500 uppercase ">ลงทะเบียนผู้ใช้</span>
                         </div>
-                    </button>
+                        <h2 class="text-4xl font-black text-black italic uppercase tracking-tighter">
+                            สร้าง <span class="text-zinc-300 group-hover:text-black transition-colors">บัญชี</span>
+                        </h2>
+                        <div class="h-1 w-12 bg-black mx-auto mt-4 rounded-full"></div>
+                    </div>
 
-                    <p class="text-center text-[11px] text-slate-500 font-bold mt-4 uppercase tracking-widest">
-                        ถ้ามีบัญชีแล้ว?
-                        <router-link to="/login"
-                            class="text-emerald-400 hover:text-emerald-300 transition-colors ml-1 underline decoration-emerald-500/30 underline-offset-4">
-                            ล็อกอินที่นี้
-                        </router-link>
-                    </p>
+                    <!-- Input Fields -->
+                    <div class="grid grid-cols-1 gap-6">
+
+                        <!-- Username -->
+                        <div class="space-y-1.5">
+                            <label class="text-[15px] font-black text-zinc-400 uppercase ml-2">ชื่อผู้ใช้งาน</label>
+                            <input v-model="username" type="text" placeholder="user-224"
+                                class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                        </div>
+
+                        <!-- Email -->
+                        <div class="space-y-1.5">
+                            <label class=" font-black text-zinc-400   ml-1">Email</label>
+                            <input v-model="email" type="email" placeholder="COMMANDER@NEXUS.ID"
+                                class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="space-y-1.5">
+                            <label class=" font-black text-zinc-400 ml-1">Password</label>
+                            <input v-model="password" type="password" placeholder="••••••••"
+                                class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                        </div>
+
+                        <!-- Terms -->
+                        <p
+                            class="text-[16px] text-zinc-400 font-bold text-center leading-relaxed px-4 uppercase tracking-tighter">
+                            เมื่อดำเนินการต่อ <span class="text-black">คุณยอมรับข้อกำหนดในการให้บริการ</span> และ
+                            <span class="text-black">นโยบายความเป็นส่วนตัว</span>.
+                        </p>
+
+                        <!-- Submit Button -->
+                        <button @click="submit" :disabled="loading"
+                            class="w-full bg-black hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] transition-all shadow-xl shadow-black/10 active:scale-[0.98] group mt-2">
+
+                            <span v-if="loading" class="flex items-center justify-center gap-3 italic">
+                                <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4" fill="none"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                Syncing...
+                            </span>
+                            <span v-else class="flex items-center justify-center gap-2 italic">
+                                สมัครสมาชิก ➜
+                            </span>
+                        </button>
+
+                        <!-- Login Link -->
+                        <p class="text-center text-[11px] text-zinc-400 font-bold mt-4 uppercase tracking-widest">
+                            มีบัญชีอยู๋แล้ว ? ไปที่
+                            <router-link to="/login"
+                                class="text-black hover:text-zinc-600 transition-colors ml-1 underline decoration-black/20 underline-offset-4 decoration-2">
+                                ล็อกอิน
+                            </router-link>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
 <style scoped>
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
-* {
-    font-family: 'Inter', sans-serif;
+@keyframes loading {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+
+    50% {
+        width: 100%;
+        left: 0;
+    }
+
+    100% {
+        width: 0%;
+        left: 100%;
+    }
 }
 
-/* Autofill styling */
+/* ปรับแต่ง Scrollbar และ Autofill ให้เข้ากับธีมขาวดำ */
 input:-webkit-autofill {
-    -webkit-text-fill-color: white;
-    -webkit-box-shadow: 0 0 0px 1000px #020617 inset;
+    -webkit-text-fill-color: black;
+    -webkit-box-shadow: 0 0 0px 1000px #F9FAFB inset;
     transition: background-color 5000s ease-in-out 0s;
 }
 </style>

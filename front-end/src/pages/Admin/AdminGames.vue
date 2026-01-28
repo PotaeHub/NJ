@@ -57,7 +57,7 @@ onMounted(loadGames)
 
 <template>
     <div
-        class="min-h-screen bg-[#FDFDFD] text-black font-sans selection:bg-black selection:text-white p-6 lg:p-12 space-y-12">
+        class="min-h-screen bg-[#FDFDFD] text-black font-[Prompt] selection:bg-black selection:text-white p-6 lg:p-12 space-y-12">
 
         <header
             class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-zinc-100 pb-10">
@@ -66,17 +66,18 @@ onMounted(loadGames)
                     <div class="p-3 bg-black text-white rounded-2xl shadow-xl shadow-black/10">
                         <LayoutGrid :size="28" stroke-width="2.5" />
                     </div>
-                    <h1 class="text-4xl font-black tracking-tighter uppercase">Inventory</h1>
+                    <h1 class="text-4xl font-black tracking-tighter uppercase">รายการเกม</h1>
                 </div>
                 <div class="h-1 w-12 bg-black ml-1"></div>
-                <p class="text-zinc-400 text-sm font-medium tracking-wide ml-1 uppercase">Asset & Stock Distribution
-                    Center</p>
+                <p class="text-zinc-400 text-sm font-medium tracking-wide ml-1 uppercase">
+                    ศูนย์กระจายสินทรัพย์และหุ้น
+                </p>
             </div>
 
             <button @click="openCreate"
                 class="group flex items-center gap-3 bg-black text-white font-black px-8 py-4 rounded-2xl shadow-2xl shadow-black/20 transition-all active:scale-95 hover:bg-zinc-800 tracking-widest text-[10px] uppercase">
                 <Plus class="h-4 w-4 transition-transform group-hover:rotate-90" stroke-width="3" />
-                Register New Asset
+                เพิ่มเกม
             </button>
         </header>
 
@@ -89,8 +90,9 @@ onMounted(loadGames)
                     <div class="flex flex-col items-center gap-4">
                         <div class="w-10 h-10 border-[3px] border-black border-t-transparent rounded-full animate-spin">
                         </div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-black">Syncing
-                            Database</span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-black">
+                            กำลังซิงค์ฐานข้อมูล
+                        </span>
                     </div>
                 </div>
             </Transition>
@@ -99,22 +101,28 @@ onMounted(loadGames)
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-zinc-50/50 border-b border-zinc-100">
-                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Media
+                            <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                                สื่อ
                             </th>
                             <th class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                                Identity</th>
+                                ชื่อผู้ใช้งาน
+                            </th>
                             <th
                                 class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-center">
-                                Valuation</th>
+                                รายได้
+                            </th>
                             <th
                                 class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-center">
-                                Stock</th>
+                                คลัง
+                            </th>
                             <th
                                 class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-center">
-                                Status</th>
+                                สถานะ
+                            </th>
                             <th
                                 class="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 text-right">
-                                Commands</th>
+                                Commands
+                            </th>
                         </tr>
                     </thead>
 
@@ -125,15 +133,9 @@ onMounted(loadGames)
                             <td class="px-8 py-6">
                                 <div v-if="g.gameMedias?.length"
                                     class="flex -space-x-3 group-hover:space-x-1 transition-all duration-500">
-                                    <div v-for="(img, idx) in g.gameMedias.filter(m => m.type === 'IMAGE').slice(0, 3)"
-                                        :key="img.id" class="relative" :style="{ zIndex: 10 - idx }">
-                                        <img :src="BACKEND_URL + img.url"
-                                            class="w-14 h-14 object-cover rounded-xl border-2 border-white shadow-md ring-1 ring-zinc-100 group-hover:scale-105 transition-transform" />
-                                    </div>
-                                    <div v-if="g.gameMedias.length > 3"
-                                        class="w-14 h-14 rounded-xl bg-black border-2 border-white flex items-center justify-center text-[10px] font-black text-white shadow-md">
-                                        +{{ g.gameMedias.length - 3 }}
-                                    </div>
+                                    <img v-for="(img, idx) in g.gameMedias.filter(m => m.type === 'IMAGE').slice(0, 3)"
+                                        :key="img.id" :src="BACKEND_URL + img.url"
+                                        class="w-14 h-14 object-cover rounded-xl border-2 border-white shadow-md ring-1 ring-zinc-100" />
                                 </div>
                                 <div v-else
                                     class="w-14 h-14 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-300">
@@ -142,72 +144,31 @@ onMounted(loadGames)
                             </td>
 
                             <td class="px-8 py-6">
-                                <div class="flex flex-col">
-                                    <span
-                                        class="text-base font-black tracking-tight text-zinc-800 group-hover:text-black transition-colors">
-                                        {{ g.title }}
-                                    </span>
-                                    <span
-                                        class="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest leading-none">
-                                        SKU-{{ g.id.toString().slice(-6).toUpperCase() }}
-                                    </span>
-                                </div>
-                            </td>
-
-                            <td class="px-8 py-6 text-center">
-                                <span class="text-sm font-black tracking-tighter">
-                                    ฿{{ g.price.toLocaleString() }}
+                                <span class="text-base font-black tracking-tight text-zinc-800">
+                                    {{ g.title }}
                                 </span>
                             </td>
 
-                            <td class="px-8 py-6 text-center">
-                                <div class="flex flex-col items-center">
-                                    <span :class="g.stock <= 5 ? 'text-red-500 font-black' : 'text-zinc-600 font-bold'"
-                                        class="text-sm leading-none">
-                                        {{ g.stock }}
-                                    </span>
-                                    <span
-                                        class="text-[8px] font-black uppercase tracking-widest text-zinc-300 mt-1">Units
-                                        Available</span>
-                                </div>
+                            <td class="px-8 py-6 text-center font-black">
+                                ฿{{ g.price.toLocaleString() }}
+                            </td>
+
+                            <td class="px-8 py-6 text-center font-bold">
+                                {{ g.stock }}
                             </td>
 
                             <td class="px-8 py-6 text-center">
-                                <span :class="{
-                                    'bg-black text-white border-black': g.status === 'PUBLISHED',
-                                    'bg-white text-zinc-400 border-zinc-200': g.status === 'DRAFT',
-                                    'bg-zinc-100 text-zinc-800 border-zinc-300': g.status === 'SOLD'
-                                }"
-                                    class="px-3 py-1.5 rounded-lg text-[9px] font-black border uppercase tracking-[0.15em] inline-block min-w-[90px]">
-                                    {{ g.status }}
-                                </span>
+                                {{ g.status }}
                             </td>
 
                             <td class="px-8 py-6 text-right">
                                 <div class="flex justify-end gap-4">
-                                    <button @click="openEdit(g)"
-                                        class="p-2 text-zinc-300 hover:text-black transition-colors"
-                                        title="Modify Asset">
-                                        <Edit3 :size="18" stroke-width="2.5" />
+                                    <button @click="openEdit(g)" class="text-zinc-300 hover:text-black">
+                                        <Edit3 :size="18" />
                                     </button>
-                                    <button @click="handleDeleteClick(g)"
-                                        class="p-2 text-zinc-200 hover:text-red-500 transition-colors"
-                                        title="Decommission">
-                                        <Trash2 :size="18" stroke-width="2.5" />
+                                    <button @click="handleDeleteClick(g)" class="text-zinc-200 hover:text-red-500">
+                                        <Trash2 :size="18" />
                                     </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr v-if="games.length === 0 && !loading">
-                            <td colspan="6" class="px-8 py-32 text-center">
-                                <div class="flex flex-col items-center">
-                                    <div
-                                        class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mb-6">
-                                        <LayoutGrid :size="32" class="text-zinc-200" />
-                                    </div>
-                                    <p class="font-black text-zinc-300 uppercase tracking-[0.3em] text-[10px]">Vault is
-                                        currently empty</p>
                                 </div>
                             </td>
                         </tr>
@@ -224,6 +185,7 @@ onMounted(loadGames)
 
 <style scoped>
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800;900&display=swap");
 
 .fade-enter-active,
 .fade-leave-active {
@@ -233,24 +195,5 @@ onMounted(loadGames)
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
-}
-
-/* Custom Scrollbar สำหรับ Table */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #e4e4e7;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #18181b;
 }
 </style>

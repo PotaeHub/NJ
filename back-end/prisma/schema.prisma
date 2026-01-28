@@ -79,7 +79,7 @@ model Order {
   buyer      User        @relation("BuyerOrders", fields: [buyerId], references: [id])
   totalPrice Float
   status     OrderStatus @default(PENDING)
-  items      OrderItem[]
+  items      OrderItem[] 
   createdAt  DateTime    @default(now())
 }
 

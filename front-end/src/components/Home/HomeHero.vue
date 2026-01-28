@@ -3,10 +3,11 @@ import { useAuthStore } from '@/store/auth';
 const auth = useAuthStore()
 
 const stats = [
-    { label: 'Active Collectors', value: '50K+' },
-    { label: 'Asset Exchanged', value: '120K+' },
-    { label: 'Elite Rating', value: '9.9/10' },
+    { label: 'นักสะสมที่ใช้งานอยู่', value: '50K+' },
+    { label: 'สินทรัพย์ที่มีการซื้อขาย', value: '120K+' },
+    { label: 'คะแนนรีวิวระดับสูง', value: '9.9/10' },
 ]
+
 </script>
 
 <template>
@@ -31,8 +32,9 @@ const stats = [
                 </div>
 
                 <h1 class="text-7xl md:text-8xl font-black text-black leading-[0.9] tracking-tighter uppercase">
-                    Level Up <br />
-                    <span class="text-zinc-300">Your Vault.</span>
+
+                    ยกระดับ <br />
+                    <span class="text-zinc-300">คลังของคุณ</span>
                 </h1>
 
                 <p class="text-lg text-zinc-400 max-w-md leading-relaxed font-medium uppercase tracking-tight">
@@ -43,16 +45,16 @@ const stats = [
                 <div class="flex flex-wrap gap-5 pt-4">
                     <RouterLink v-if="!auth.user" to="/register"
                         class="px-10 py-5 bg-black text-white font-black rounded-2xl transition-all shadow-2xl shadow-black/20 hover:bg-zinc-800 active:scale-95 uppercase text-[11px] tracking-widest">
-                        Join The Club
+                        เข้าร่วม
                     </RouterLink>
 
                     <RouterLink to="/games"
                         class="px-10 py-5 bg-white text-black font-black rounded-2xl border border-zinc-200 transition-all hover:border-black active:scale-95 uppercase text-[11px] tracking-widest">
-                        Browse Assets
+                        ดูคลังเกม
                     </RouterLink>
                 </div>
 
-                <div class="pt-12 flex items-center gap-12 border-t border-zinc-100">
+                <div class="pt-12 flex items-center gap-12 border-t border-black">
                     <div v-for="stat in stats" :key="stat.label">
                         <p class="text-3xl font-black text-black tracking-tighter">{{ stat.value }}</p>
                         <p class="text-[9px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-1">{{ stat.label }}
@@ -65,15 +67,16 @@ const stats = [
                 <div class="relative z-10 animate-float">
                     <div
                         class="relative p-4 bg-white rounded-[3.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-zinc-50">
-                        <img src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=800&auto=format&fit=crop"
-                            class="rounded-[2.8rem] grayscale hover:grayscale-0 transition-all duration-1000 object-cover aspect-[4/5]"
-                            alt="Gaming Culture" />
+                        <img src="https://i.pinimg.com/1200x/87/04/c7/8704c75eb516e923c3668f871ebcdd6c.jpg"
+                            alt="Gaming Culture" class="w-full h-full rounded-[2.8rem] grayscale hover:grayscale-0
+               transition-all duration-1000 object-cover aspect-[1199/803]" />
                     </div>
+
 
                     <div
                         class="absolute -top-10 -right-10 bg-black p-8 rounded-[2.5rem] shadow-2xl animate-bounce-slow border-4 border-white">
-                        <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1 text-center">
-                            Certified</p>
+                        <p class="text-[10px]  text-zinc-100 uppercase tracking-widest mb-1 text-center">
+                            ได้รับการรับรอง</p>
                         <p class="text-2xl font-black text-white italic leading-none text-center">100%</p>
                     </div>
 
@@ -88,8 +91,8 @@ const stats = [
                         </div>
                         <div>
                             <p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none">
-                                Protection</p>
-                            <p class="text-sm font-black text-black">Active Shield</p>
+                                การป้องกัน</p>
+                            <p class="text-sm font-black text-black">ป้องกันแบบแอคทีฟ</p>
                         </div>
                     </div>
                 </div>

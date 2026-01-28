@@ -18,12 +18,12 @@
         </div>
 
         <div class="p-4">
-            <h3 class="font-bold text-lg truncate">
+            <h3 class="font-bold text-lg truncate text-black">
                 {{ game.title }}
             </h3>
 
             <p class="text-indigo-600 font-bold mt-2">
-                {{ game.price.toLocaleString() }} ฿
+                ราคา {{ game.price.toLocaleString() }} บาท
             </p>
         </div>
     </div>

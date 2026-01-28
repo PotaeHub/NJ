@@ -166,7 +166,7 @@
                                         <div class="w-2 h-2 rounded-full bg-black"></div>
                                         <span class="font-bold text-zinc-700">{{ item.game.title }}</span>
                                         <span class="text-[10px] text-zinc-300 font-black italic">x{{ item.quantity
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span class="font-black">฿{{ format(item.price * item.quantity) }}</span>
                                 </div>
@@ -201,7 +201,8 @@ const selectedOrder = ref(null)
 
 const loadOrders = async () => {
     try {
-        const { data } = await api.get("/admin/orders")
+        const { data } = await api.get("/admin/orders");
+        console.log(data)
         orders.value = data
     } catch (e) { console.error(e) }
 }
@@ -229,10 +230,10 @@ const format = (n) => new Intl.NumberFormat("th-TH").format(n || 0)
 const formatDate = (d) => new Date(d).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' })
 
 const statusClass = (status) => ({
-    PENDING: "bg-zinc-100 text-zinc-400",
-    PAID: "bg-black text-white",
-    COMPLETED: "bg-zinc-100 text-black border border-zinc-200",
-    CANCELLED: "bg-rose-50 text-rose-500 border border-rose-100"
+    กำลังทำ: "bg-zinc-100 text-zinc-400",
+    รออนุมัติ: "bg-black text-white",
+    อนุมัติแล้ว: "bg-zinc-100 text-black border border-zinc-200",
+    ยกเลิกอนุมัติ: "bg-rose-50 text-rose-500 border border-rose-100"
 }[status])
 
 onMounted(loadOrders)

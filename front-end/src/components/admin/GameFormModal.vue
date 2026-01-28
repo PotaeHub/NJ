@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, watch } from "vue"
 import api from "@/services/api"
 
@@ -165,7 +166,7 @@ const submit = async () => {
                 <div>
                     <h2 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
                         <span class="p-2 bg-indigo-50 rounded-xl text-xl">{{ game ? '✏️' : '➕' }}</span>
-                        {{ game ? "Edit Game Details" : "Create New Entry" }}
+                        {{ game ? "แก้ไขรายละเอียด" : "เพิ่มเกม" }}
                     </h2>
                     <p class="text-sm text-slate-400 font-medium ml-12">บริหารจัดการข้อมูลสินค้าและสื่อโปรโมชัน</p>
                 </div>
@@ -238,9 +239,9 @@ const submit = async () => {
                                 <label class="label-new">Status</label>
                                 <select v-model="status"
                                     class="input-new font-bold appearance-none cursor-pointer bg-slate-50">
-                                    <option value="PUBLISHED">🟢 Published</option>
-                                    <option value="DRAFT">⚪ Draft Mode</option>
-                                    <option value="SOLD">🔴 Sold Out</option>
+                                    <option value="PUBLISHED">🟢 Published(เผยแพร่)</option>
+                                    <option value="DRAFT">⚪ Draft Mode(ยังไม่เผยแพร่)</option>
+                                    <option value="SOLD">🔴 Sold Out(ขายหมดแล้ว)</option>
                                 </select>
                             </div>
                         </div>

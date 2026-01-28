@@ -30,127 +30,140 @@ const submit = async () => {
     }
 }
 </script>
-
 <template>
-    <div class="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative overflow-hidden">
+    <div
+        class="min-h-screen bg-[#FDFDFD] flex items-center justify-center p-6 relative overflow-hidden font-sans selection:bg-black selection:text-white">
 
-        <div
-            class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full animate-pulse">
-        </div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-purple-600/10 blur-[100px] rounded-full">
+        <!-- Background Decorative Elements (Soft Grey) -->
+        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-zinc-100/50 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-zinc-200/30 blur-[100px] rounded-full">
         </div>
 
-        <div class="w-full max-w-md relative">
+        <div class="w-full max-w-[440px] relative group">
+            <!-- Subtle Outer Border -->
             <div
-                class="absolute inset-0 bg-white/[0.02] backdrop-blur-2xl rounded-[3rem] border border-white/10 shadow-2xl">
+                class="absolute -inset-1 bg-zinc-200 rounded-[2.5rem] opacity-20 group-hover:opacity-40 transition duration-500">
             </div>
 
-            <div class="relative p-10 md:p-12">
-                <div class="flex justify-center mb-8">
-                    <router-link to="/"
-                        class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(79,70,229,0.3)] group hover:rotate-12 transition-transform">
-                        <span class="text-white text-3xl font-black italic">N</span>
-                    </router-link>
-                </div>
+            <!-- Main Card -->
+            <div
+                class="relative bg-white rounded-[2.5rem] border border-zinc-100 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)] overflow-hidden">
 
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl font-black text-white italic uppercase tracking-tighter">
-                        Welcome Back <br />
-                        <span class="text-indigo-500">Commander</span>
-                    </h2>
-                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-3 opacity-70">
-                        จำเป็นต้องมีการเชื่อมต่อประสาทที่ปลอดภัย
-                    </p>
-                </div>
+                <!-- Top Progress Bar (Black) -->
+                <div v-if="loading" class="absolute top-0 left-0 h-[2px] bg-black animate-[loading_2s_infinite]"></div>
 
-                <Transition name="fade">
-                    <div v-if="errorMessage"
-                        class="mb-6 flex items-start gap-3 bg-rose-500/10 border border-rose-500/20 p-4 rounded-2xl">
-                        <span class="text-rose-500 animate-pulse">⚠️</span>
-                        <div class="flex-1">
-                            <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest">System Error</p>
-                            <p class="text-xs text-rose-200/80 font-medium">{{ errorMessage }}</p>
-                        </div>
-                        <button @click="errorMessage = ''"
-                            class="text-rose-500/50 hover:text-rose-500 text-lg leading-none">&times;</button>
-                    </div>
-                </Transition>
-
-                <div class="space-y-6">
-                    <div class="space-y-2">
-                        <label
-                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">อีเมล</label>
-                        <div class="relative group">
-                            <input v-model="email" type="email" placeholder="name@example.com" :class="[
-                                'w-full bg-black/40 border rounded-2xl px-6 py-4 text-white outline-none transition-all placeholder:text-slate-700 font-medium',
-                                errorMessage ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-white/5 focus:border-indigo-500/50 focus:ring-indigo-500/5 focus:ring-4'
-                            ]" />
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label
-                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">รหัสผ่าน</label>
-                        <div class="relative group">
-                            <input v-model="password" type="password" placeholder="••••••••" :class="[
-                                'w-full bg-black/40 border rounded-2xl px-6 py-4 text-white outline-none transition-all placeholder:text-slate-700 font-medium',
-                                errorMessage ? 'border-rose-500/50 focus:ring-rose-500/10' : 'border-white/5 focus:border-indigo-500/50 focus:ring-indigo-500/5 focus:ring-4'
-                            ]" />
-                        </div>
-                    </div>
-
-                    <button @click="submit" :disabled="loading"
-                        class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:opacity-50 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] transition-all shadow-[0_0_25px_rgba(79,70,229,0.2)] active:scale-[0.98] relative overflow-hidden group mt-4">
-                        <span v-if="loading" class="flex items-center justify-center gap-3 italic">Syncing...</span>
-                        <span v-else class="flex items-center justify-center gap-2">Login ➜</span>
-                        <div
-                            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700">
-                        </div>
-                    </button>
-
-                    <p class="text-center text-[11px] text-slate-500 font-bold mt-8 uppercase tracking-widest">
-                        ถ้ายังไม่มีบัญชี
-                        <router-link to="/register"
-                            class="text-indigo-400 hover:text-indigo-300 transition-colors ml-1 underline decoration-indigo-500/30 underline-offset-4">
-                            สร้างบัญชี
+                <div class="p-10 md:p-12">
+                    <!-- Logo Section -->
+                    <div class="flex flex-col items-center mb-10">
+                        <router-link to="/" class="relative group">
+                            <div
+                                class="w-20 h-20 bg-black rounded-2xl flex items-center justify-center shadow-xl transition-all duration-500 group-hover:scale-105">
+                                <span class="text-white text-4xl font-black italic tracking-tighter">N</span>
+                            </div>
                         </router-link>
-                    </p>
+                        <h2
+                            class="mt-8 text-3xl font-black text-black italic uppercase tracking-tighter text-center leading-none">
+                            ล็อก <span class="text-zinc-400">อิน</span>
+                        </h2>
+                        <div class="h-1 w-10 bg-black mt-3 rounded-full"></div>
+                    </div>
+
+                    <!-- Error Alert (Monochrome Style) -->
+                    <Transition name="slide-down">
+                        <div v-if="errorMessage"
+                            class="mb-8 overflow-hidden rounded-2xl border border-black/5 bg-zinc-50 p-4 flex gap-3 items-center">
+                            <div class="w-8 h-8 rounded-full bg-black flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs">!</span>
+                            </div>
+                            <p class="text-xs font-bold text-black tracking-tight">{{ errorMessage }}</p>
+                        </div>
+                    </Transition>
+
+                    <!-- Form -->
+                    <form @submit.prevent="submit" class="space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="font-black text-zinc-400  ml-2">
+                                Email</label>
+                            <div class="relative">
+                                <input v-model="email" type="email" placeholder="USER@NEXUS.ID"
+                                    class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class=" font-black text-zinc-400  ml-2">Password</label>
+                            <div class="relative">
+                                <input v-model="password" type="password" placeholder="••••••••"
+                                    class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                            </div>
+                        </div>
+
+                        <button :disabled="loading"
+                            class="w-full mt-6 relative group/btn overflow-hidden rounded-2xl bg-black p-5 text-white transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:bg-zinc-200 disabled:text-zinc-400 shadow-lg shadow-black/5">
+                            <div
+                                class="relative z-10 flex items-center justify-center gap-3 font-black uppercase tracking-[0.2em] italic">
+                                <span v-if="!loading">ล็อกอิน</span>
+                                <span v-else class="animate-pulse">Verifying...</span>
+                                <span class="group-hover/btn:translate-x-1 transition-transform">➜</span>
+                            </div>
+                        </button>
+                    </form>
+
+                    <div class="mt-8 text-center">
+                        <router-link to="/register"
+                            class="text-[16px] font-black text-zinc-400  tracking-widest hover:text-black transition-colors">
+                            ไม่มีบัญชีใช่ไหม? <span
+                                class="text-black underline underline-offset-4 ml-1">สมัครสมาชิก</span>
+                        </router-link>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 opacity-30">
-            <div class="w-1 h-1 bg-emerald-500 rounded-full animate-ping"></div>
-            <span class="text-[9px] font-black text-white uppercase tracking-[0.4em]">Encrypted Connection Active</span>
+        <!-- Footer Info -->
+        <div class="absolute bottom-8 left-0 right-0 flex justify-center items-center gap-6 opacity-40">
+            <span class="text-[9px] font-black text-black uppercase tracking-[0.3em]">System v2.0.26</span>
+            <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+            <span class="text-[9px] font-black text-black uppercase tracking-[0.3em]">Status: Encrypted</span>
         </div>
     </div>
 </template>
 
 <style scoped>
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
-* {
-    font-family: 'Inter', sans-serif;
+@keyframes loading {
+    0% {
+        width: 0%;
+        left: 0;
+    }
+
+    50% {
+        width: 100%;
+        left: 0;
+    }
+
+    100% {
+        width: 0%;
+        left: 100%;
+    }
 }
 
-/* Animation สำหรับ Error Message */
-.fade-enter-active,
-.fade-leave-active {
-    transition: all 0.3s ease;
+.slide-down-enter-active,
+.slide-down-leave-active {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.fade-enter-from,
-.fade-leave-to {
+.slide-down-enter-from,
+.slide-down-leave-to {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-20px);
+    max-height: 0;
 }
 
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: white;
-    -webkit-box-shadow: 0 0 0px 1000px #020617 inset;
-    transition: background-color 5000s ease-in-out 0s;
+/* รักษาสี Autofill ให้เป็นธีมขาวดำ */
+input:-webkit-autofill {
+    -webkit-text-fill-color: black;
+    -webkit-box-shadow: 0 0 0px 1000px #F9FAFB inset;
 }
 </style>

@@ -81,21 +81,21 @@ watch(
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="h-1 w-12 bg-black"></div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Digital
-                            Collection</span>
+                        <span
+                            class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">คอลเลกชันดิจิตอล</span>
                     </div>
                     <h3 class="text-6xl font-black text-black tracking-tighter uppercase leading-[0.8]">
-                        The <br /> <span class="text-zinc-300">Archives.</span>
+                        <span class="text-black-300">หมวดหมู่</span>
                     </h3>
                     <p class="text-zinc-400 text-sm font-medium tracking-wide max-w-xs uppercase">
-                        Curated Selection of Premium Digital Assets & Interactive Media
+                        คัดสรรสุดยอดสินทรัพย์ดิจิทัลและสื่ออินเทอร์แอ็กทีฟ
                     </p>
                 </div>
 
                 <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
                     <button @click="filterByCategory('ALL')" class="category-btn"
                         :class="activeCategory === 'ALL' ? 'active' : ''">
-                        ALL
+                        ทั้งหมด
                     </button>
 
                     <button v-for="cat in categories" :key="cat.id" @click="filterByCategory(cat.name)"
@@ -117,7 +117,7 @@ watch(
                 class="text-center py-48 bg-zinc-50 rounded-[4rem] border border-dashed border-zinc-200">
                 <div class="text-4xl mb-6 grayscale opacity-20">📂</div>
                 <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">
-                    Vault Empty for this category
+                    พื้นที่เก็บข้อมูลว่างเปล่าสำหรับหมวดหมู่นี้
                 </h3>
             </div>
 
@@ -132,7 +132,8 @@ watch(
 </template>
 
 <style scoped>
-    @import "tailwindcss";
+@import "tailwindcss";
+
 .category-btn {
     @apply px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 border border-zinc-100 whitespace-nowrap hover:bg-zinc-50 hover:border-zinc-300 text-zinc-400;
 }

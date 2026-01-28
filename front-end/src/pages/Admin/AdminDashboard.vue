@@ -1,140 +1,191 @@
 <template>
-    <div
-        class="min-h-screen bg-[#FDFDFD] text-black font-sans selection:bg-black selection:text-white p-6 lg:p-12 space-y-12">
+    <div class="min-h-screen bg-[#FDFDFD] text-black font-sans selection:bg-black selection:text-white p-6 lg:p-12">
 
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-100 pb-8">
-            <div class="space-y-1">
-                <h1 class="text-4xl font-black tracking-tighter uppercase">การวิเคราะห์แพลตฟอร์ม</h1>
-                <div class="h-1 w-12 bg-black"></div>
-                <p class="text-zinc-400 text-sm font-medium tracking-wide">การเติบโตของแพลตฟอร์มและประสิทธิภาพเชิงกลยุทธ์
-ตัวชี้วัด</p>
+        <!-- Header Section -->
+        <div class="max-w-7xl mx-auto space-y-12">
+            <header class="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-zinc-100 pb-10">
+                <div class="space-y-3">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200">
+                        <div class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></div>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">System Live
+                            Analysis</span>
+                    </div>
+                    <h1 class="text-5xl font-black tracking-tight uppercase leading-none">การวิเคราะห์<br /><span
+                            class="text-zinc-400">แพลตฟอร์ม</span></h1>
+                    <p class="text-zinc-400 text-sm font-medium tracking-wide max-w-md">
+                        ตรวจสอบประสิทธิภาพเชิงกลยุทธ์และการเติบโตของระบบแบบ Real-time</p>
+                </div>
+                <button @click="refreshAll"
+                    class="group flex items-center gap-3 px-8 py-4 bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-zinc-800 transition-all active:scale-95 shadow-2xl shadow-black/10">
+                    <span>รีเฟรชข้อมูล</span>
+                    <span class="group-hover:rotate-180 transition-transform duration-500 text-lg">↻</span>
+                </button>
+            </header>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="summary-card group">
+                    <div class="flex justify-between items-start mb-6">
+                        <div
+                            class="p-3 bg-zinc-50 rounded-xl group-hover:bg-black group-hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <span
+                            class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic group-hover:text-black">Revenue</span>
+                    </div>
+                    <p class="label">รายได้รวม</p>
+                    <p class="value italic">฿{{ format(summary.revenue) }}</p>
+                </div>
+
+                <div class="summary-card group">
+                    <div class="flex justify-between items-start mb-6">
+                        <div
+                            class="p-3 bg-zinc-50 rounded-xl group-hover:bg-black group-hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <span
+                            class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic group-hover:text-black">Users</span>
+                    </div>
+                    <p class="label">ผู้ใช้งานทั้งหมด</p>
+                    <p class="value italic">{{ format(summary.users) }} <span
+                            class="text-sm text-zinc-400 font-medium tracking-normal">Account</span></p>
+                </div>
+
+                <div class="summary-card group">
+                    <div class="flex justify-between items-start mb-6">
+                        <div
+                            class="p-3 bg-zinc-50 rounded-xl group-hover:bg-black group-hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                        </div>
+                        <span
+                            class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic group-hover:text-black">Orders</span>
+                    </div>
+                    <p class="label">ออเดอร์ทั้งหมด</p>
+                    <p class="value italic">{{ format(summary.orders) }} <span
+                            class="text-sm text-zinc-400 font-medium tracking-normal">Trades</span></p>
+                </div>
             </div>
-            <button @click="refreshAll"
-                class="px-8 py-3 bg-black text-white text-[20px] font-black uppercase  rounded-full hover:bg-zinc-800 transition-all active:scale-95 shadow-xl shadow-black/10">
-                รีเฟรช
-            </button>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="summary-card group">
-                <div class="flex justify-between items-start">
-                    <p class="label">Total Revenue</p>
-                    <div class="w-2 h-2 rounded-full bg-black group-hover:animate-ping"></div>
-                </div>
-                <p class="value">฿{{ format(summary.revenue) }}</p>
-                <div class="mt-4 flex items-center gap-2">
-                    <span
-                        class="text-[10px] font-black bg-zinc-100 px-2 py-0.5 rounded uppercase tracking-tighter">Gross
-                        Income</span>
-                </div>
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Doughnut Chart (Smaller Span) -->
+                <section class="chart-card lg:col-span-4">
+                    <div class="chart-header">
+                        <h2>การกระจายคำสั่งซื้อ</h2>
+                        <div class="w-2 h-2 rounded-full bg-zinc-200"></div>
+                    </div>
+                    <div class="canvas-container !h-[280px]"><canvas ref="orderStatusChart" /></div>
+                </section>
+
+                <!-- Bar Charts (Larger Span) -->
+                <section class="chart-card lg:col-span-8">
+                    <div class="chart-header">
+                        <h2>ชื่อเกมระดับท็อป (ยอดขายสูงสุด)</h2>
+                        <span class="text-[10px] font-bold text-zinc-400">RANKING</span>
+                    </div>
+                    <div class="canvas-container !h-[280px]"><canvas ref="topGamesChart" /></div>
+                </section>
+
+                <section class="chart-card lg:col-span-12">
+                    <div class="chart-header">
+                        <h2>พ่อค้าระดับพรีเมียมที่มีประสิทธิภาพสูงสุด</h2>
+                        <div class="flex gap-2">
+                            <div class="w-8 h-1 bg-black"></div>
+                            <div class="w-8 h-1 bg-zinc-100"></div>
+                        </div>
+                    </div>
+                    <div class="canvas-container !h-[320px]"><canvas ref="topSellersChart" /></div>
+                </section>
             </div>
-
-            <div class="summary-card group">
-                <p class="label">Total Active Users</p>
-                <p class="value">{{ format(summary.users) }}</p>
-                <div class="mt-4 flex items-center gap-2">
-                    <span
-                        class="text-[10px] font-black bg-zinc-100 px-2 py-0.5 rounded uppercase tracking-tighter">Verified
-                        Accounts</span>
-                </div>
-            </div>
-
-            <div class="summary-card group">
-                <p class="label">Processed Orders</p>
-                <p class="value">{{ format(summary.orders) }}</p>
-                <div class="mt-4 flex items-center gap-2">
-                    <span
-                        class="text-[10px] font-black bg-zinc-100 px-2 py-0.5 rounded uppercase tracking-tighter">Successful
-                        Trades</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-            <section class="chart-card">
-                <div class="chart-header">
-                    <h2>Daily Sales Performance</h2>
-                    <span class="dot"></span>
-                </div>
-                <div class="canvas-container"><canvas ref="dailyChart" /></div>
-            </section>
-
-            <section class="chart-card">
-                <div class="chart-header">
-                    <h2>Monthly Revenue Cycle</h2>
-                </div>
-                <div class="canvas-container"><canvas ref="monthlyChart" /></div>
-            </section>
-
-            <section class="chart-card">
-                <div class="chart-header">
-                    <h2>Cumulative Growth</h2>
-                </div>
-                <div class="canvas-container"><canvas ref="revenueChart" /></div>
-            </section>
-
-            <section class="chart-card">
-                <div class="chart-header">
-                    <h2>Order Distribution</h2>
-                </div>
-                <div class="canvas-container h-[250px]"><canvas ref="orderStatusChart" /></div>
-            </section>
-
-            <section class="chart-card">
-                <div class="chart-header">
-                    <h2>Top Tier Titles</h2>
-                </div>
-                <div class="canvas-container"><canvas ref="topGamesChart" /></div>
-            </section>
-
-            <section class="chart-card">
-                <div class="chart-header">
-                    <h2>Premium Merchants</h2>
-                </div>
-                <div class="canvas-container"><canvas ref="topSellersChart" /></div>
-            </section>
-
-            <section class="chart-card md:col-span-2 xl:col-span-3">
-                <div class="chart-header border-none">
-                    <h2 class="text-xl">User Acquisition Timeline</h2>
-                    <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Growth analysis over
-                        the fiscal year</p>
-                </div>
-                <div class="canvas-container !h-72 mt-6"><canvas ref="newUsersChart" /></div>
-            </section>
         </div>
     </div>
 </template>
+
+<style scoped>
+@import "tailwindcss";
+
+.label {
+    @apply text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-1;
+}
+
+.value {
+    @apply text-4xl font-black tracking-tighter text-black;
+}
+
+.chart-header {
+    @apply flex justify-between items-center mb-10;
+}
+
+.chart-header h2 {
+    @apply text-xs font-black uppercase tracking-[0.2em] text-zinc-800;
+}
+
+.canvas-container {
+    @apply w-full;
+}
+</style>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import Chart from 'chart.js/auto'
 
-const dailyChart = ref()
-const monthlyChart = ref()
-const revenueChart = ref()
+/* =========================
+   REFS
+========================= */
 const orderStatusChart = ref()
 const topGamesChart = ref()
 const topSellersChart = ref()
-const newUsersChart = ref()
 
 const summary = ref({ revenue: 0, users: 0, orders: 0 })
 let charts = []
 
+/* =========================
+   UTILS
+========================= */
 const format = (n) => new Intl.NumberFormat('th-TH').format(n || 0)
 
-/* ปรับแต่ง Chart Config ให้เป็นธีมขาวดำ */
-const createChart = (el, type, labels, data, isDoughnut = false) => {
-    const ctx = el.getContext('2d');
+/* =========================
+   COLOR PALETTES
+========================= */
+const palette = {
+    primary: '#6366f1',   // indigo
+    success: '#22c55e',   // green
+    warning: '#f59e0b',   // amber
+    danger: '#ef4444',    // red
+    info: '#0ea5e9',      // sky
+    dark: '#020617',
+    gray: '#94a3b8'
+}
 
-    // Gradient สำหรับพื้นที่ใต้กราฟเส้น
-    let gradient = null;
-    if (type === 'line') {
-        gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.05)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    }
+const doughnutColors = [
+    palette.primary,
+    palette.success,
+    palette.warning,
+    palette.danger,
+    palette.info
+]
+
+/* =========================
+   CHART FACTORY
+========================= */
+const createChart = (el, type, labels, data, isDoughnut = false) => {
+    if (!el) return
+    const ctx = el.getContext('2d')
 
     const chart = new Chart(ctx, {
         type,
@@ -142,102 +193,108 @@ const createChart = (el, type, labels, data, isDoughnut = false) => {
             labels,
             datasets: [{
                 data,
-                backgroundColor: isDoughnut
-                    ? ['#000000', '#27272a', '#52525b', '#a1a1aa', '#e4e4e7']
-                    : (type === 'bar' ? '#000000' : gradient),
-                borderColor: '#000000',
-                borderWidth: type === 'bar' ? 0 : 2.5,
-                pointBackgroundColor: '#000000',
-                pointRadius: 0,
-                pointHoverRadius: 6,
-                tension: 0.4,
-                fill: true
+                backgroundColor: isDoughnut ? doughnutColors : palette.primary,
+                borderColor: '#ffffff',
+                borderWidth: isDoughnut ? 2 : 0,
+                borderRadius: type === 'bar' ? 12 : 0,
+                hoverBackgroundColor: palette.info,
+                tension: 0.4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: isDoughnut,
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 10,
+                        padding: 20,
+                        color: palette.dark,
+                        font: {
+                            size: 11,
+                            weight: 'bold'
+                        }
+                    }
+                },
                 tooltip: {
-                    backgroundColor: '#000',
-                    titleFont: { size: 10, weight: 'bold' },
-                    bodyFont: { size: 12 },
+                    backgroundColor: '#020617',
+                    titleColor: '#fff',
+                    bodyColor: '#e5e7eb',
                     padding: 12,
-                    displayColors: false,
-                    cornerRadius: 8
+                    cornerRadius: 12
                 }
             },
             scales: isDoughnut ? {} : {
                 y: {
-                    grid: { color: '#f4f4f5', drawBorder: false },
-                    ticks: { font: { size: 10, family: 'Inter' }, color: '#a1a1aa' }
+                    grid: {
+                        color: '#f1f5f9',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: palette.gray,
+                        font: { size: 11, weight: 'bold' }
+                    }
                 },
                 x: {
                     grid: { display: false },
-                    ticks: { font: { size: 10, family: 'Inter' }, color: '#a1a1aa' }
+                    ticks: {
+                        color: palette.gray,
+                        font: { size: 11, weight: 'bold' }
+                    }
                 }
             }
         }
     })
+
     charts.push(chart)
 }
 
+/* =========================
+   LOAD DATA
+========================= */
 const loadAll = async () => {
     charts.forEach(c => c.destroy())
     charts = []
 
     try {
         const { data } = await api.get('/admin/dashboard')
+
         summary.value = data.summary
         const a = data.analytics
 
-        createChart(dailyChart.value, 'line', a.dailySales.map(i => i.date), a.dailySales.map(i => i.total))
-        createChart(monthlyChart.value, 'bar', a.monthlySales.map(i => i.month), a.monthlySales.map(i => i.total))
-        createChart(revenueChart.value, 'line', a.cumulativeRevenue.map(i => i.date), a.cumulativeRevenue.map(i => i.total))
-        createChart(orderStatusChart.value, 'doughnut', a.orderStatus.map(i => i.status), a.orderStatus.map(i => i.count), true)
-        createChart(topGamesChart.value, 'bar', a.topGames.map(i => i.game), a.topGames.map(i => i.total))
-        createChart(topSellersChart.value, 'bar', a.topSellers.map(i => i.seller), a.topSellers.map(i => i.total))
-        createChart(newUsersChart.value, 'line', a.newUsers.map(i => `M${i.month}`), a.newUsers.map(i => i.total))
-    } catch (e) { console.error(e) }
+        createChart(
+            orderStatusChart.value,
+            'doughnut',
+            a.orderStatus.map(i => i.status),
+            a.orderStatus.map(i => i.count),
+            true
+        )
+
+        createChart(
+            topGamesChart.value,
+            'bar',
+            a.topGames.map(i => i.game),
+            a.topGames.map(i => i.total)
+        )
+
+        createChart(
+            topSellersChart.value,
+            'bar',
+            a.topSellers.map(i => i.seller),
+            a.topSellers.map(i => i.total)
+        )
+
+    } catch (e) {
+        console.error(e)
+    }
 }
 
+/* =========================
+   ACTIONS
+========================= */
 const refreshAll = () => loadAll()
+
 onMounted(loadAll)
 </script>
-
-<style scoped>
-@import "tailwindcss";
-
-.summary-card {
-    @apply bg-white rounded-[2rem] p-8 border border-zinc-100 shadow-[0_10px_30px_-15px_rgba(0, 0, 0, 0.05)] hover:border-black transition-all duration-500;
-}
-
-.label {
-    @apply text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em];
-}
-
-.value {
-    @apply text-4xl font-black mt-3 tracking-tighter;
-}
-
-.chart-card {
-    @apply bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-sm transition-all;
-}
-
-.chart-header {
-    @apply flex items-center justify-between mb-8 pb-4 border-b border-zinc-50;
-}
-
-.chart-header h2 {
-    @apply text-xs font-black uppercase tracking-widest text-zinc-800;
-}
-
-.dot {
-    @apply w-1.5 h-1.5 bg-black rounded-full;
-}
-
-.canvas-container {
-    @apply h-[220px] w-full;
-}
-</style>

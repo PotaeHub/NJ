@@ -14,14 +14,7 @@ const deleteTarget = ref(null)
 
 const form = ref({
     name: '',
-    icon: 'Gamepad',
 })
-
-/* ================= GAME ICONS ================= */
-const gameOnlyIcons = [
-    'Gamepad', 'Joystick', 'Monitor', 'Laptop', 'Disc',
-    'Download', 'Flame', 'Star', 'Trophy', 'Swords', 'Shield'
-]
 
 /* ================= HELPERS ================= */
 const getIcon = (icon) => Icons[icon] || Icons.Gamepad
@@ -128,7 +121,6 @@ onMounted(fetchCategories)
                 <thead>
                     <tr class="text-[10px] uppercase tracking-[0.2em] text-zinc-400">
                         <th class="px-6 py-2 text-left">ชื่อหมวดหมู๋</th>
-                        <th class="px-6 py-2 text-left">Icon</th>
                         <th class="px-6 py-2 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -139,13 +131,6 @@ onMounted(fetchCategories)
                         <td class="px-6 py-5 rounded-l-xl font-bold">
                             {{ cat.name }}
                         </td>
-
-                        <td class="px-6 py-5">
-                            <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-50 border">
-                                <component :is="getIcon(cat.icon)" class="w-5 h-5" />
-                            </div>
-                        </td>
-
                         <td class="px-6 py-5 text-right rounded-r-xl space-x-4">
                             <button @click="openEditModal(cat)"
                                 class="text-xs font-bold text-zinc-400 hover:text-black">
@@ -176,18 +161,6 @@ onMounted(fetchCategories)
                             <p v-if="errorMessage" class="text-red-500 text-xs mt-1">
                                 {{ errorMessage }}
                             </p>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-bold block mb-3 text-center">Icon</label>
-                            <div class="grid grid-cols-6 gap-3">
-                                <button v-for="icon in gameOnlyIcons" :key="icon" @click="form.icon = icon"
-                                    class="aspect-square rounded-xl border flex items-center justify-center" :class="form.icon === icon
-                                        ? 'bg-black text-white border-black'
-                                        : 'border-zinc-100 text-zinc-400 hover:border-black'">
-                                    <component :is="getIcon(icon)" class="w-5 h-5" />
-                                </button>
-                            </div>
                         </div>
                     </div>
 

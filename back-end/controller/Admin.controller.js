@@ -67,8 +67,6 @@ export const createGame = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
-
-
 export const getAllGames = async (req, res) => {
     try {
         const { category } = req.query
@@ -173,9 +171,6 @@ export const updateGame = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
-
-
-
 export const deleteGame = async (req, res) => {
     try {
         const { id } = req.params
@@ -618,7 +613,8 @@ export const adminGetOrders = async (req, res) => {
                         game: {
                             select: {
                                 id: true,
-                                title: true
+                                title: true,
+
                             }
                         }
                     }
@@ -749,9 +745,9 @@ export const adminCancelOrder = async (req, res) => {
 // Category
 export const adminCreateCategory = async (req, res) => {
     try {
-        const { name, icon, type } = req.body
+        const { name } = req.body
 
-        if (!name || !type) {
+        if (!name) {
             return res.status(400).json({
                 success: false,
                 message: "name and type are required"
@@ -770,7 +766,7 @@ export const adminCreateCategory = async (req, res) => {
         }
 
         const category = await prisma.category.create({
-            data: { name, icon, type }
+            data: { name }
         })
 
         res.status(201).json({
