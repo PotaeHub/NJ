@@ -25,6 +25,7 @@ import { useAuthStore } from '@/store/auth'
 import GameDetail from '../pages/GameDetail.vue'
 import BuyerCart from '../components/Home/BuyerCart.vue'
 import GamesList from '../pages/GamesList.vue'
+import AdminCategories from '../pages/Admin/AdminCategories.vue'
 
 const routes = [
     {
@@ -63,7 +64,8 @@ const routes = [
             { path: 'dashboard', component: AdminDashboard },
             { path: 'games', component: AdminGames },
             { path: 'users', component: AdminUsers },
-            { path: 'orders', component: AdminOrders }
+            { path: 'orders', component: AdminOrders },
+            { path: 'category', component: AdminCategories }
         ]
     },
 

@@ -12,11 +12,33 @@ const form = ref({
     email: "",
     password: "",
     role: "BUYER",
-    avatar: null
+    avatar: null,
+    avatarPreview: null
 })
 
-const handleFile = (e) => {
-    form.value.avatar = e.target.files[0]
+const fileInput = ref(null)
+
+const handleFile = (file) => {
+    if (!file || !file.type.startsWith("image/")) return
+
+    form.value.avatar = file
+    form.value.avatarPreview = URL.createObjectURL(file)
+}
+
+const onFileChange = (e) => {
+    const file = e.target.files[0]
+    handleFile(file)
+}
+
+const onDrop = (e) => {
+    const file = e.dataTransfer.files[0]
+    handleFile(file)
+}
+
+const removeAvatar = () => {
+    form.value.avatar = null
+    form.value.avatarPreview = null
+    fileInput.value.value = ""
 }
 
 const handleSubmit = () => {
@@ -45,7 +67,8 @@ watch(() => props.show, (val) => {
             email: "",
             password: "",
             role: "BUYER",
-            avatar: null
+            avatar: null,
+            avatarPreview: null
         }
     }
 })
@@ -54,7 +77,6 @@ watch(() => props.show, (val) => {
 <template>
     <div v-if="show" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
         @click.self="$emit('close')">
-
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
 
             <!-- Header -->
@@ -65,6 +87,26 @@ watch(() => props.show, (val) => {
 
             <!-- Body -->
             <div class="p-6 space-y-4">
+
+                <!-- Avatar Upload -->
+                <div class="border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition
+                           hover:border-indigo-500" @click="fileInput.click()" @dragover.prevent
+                    @drop.prevent="onDrop">
+                    <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileChange" />
+
+                    <div v-if="!form.avatarPreview" class="text-sm text-gray-400">
+                        ลากรูปมาวางที่นี่ หรือคลิกเพื่อเลือกรูป
+                    </div>
+
+                    <div v-else class="relative inline-block">
+                        <img :src="form.avatarPreview" class="w-32 h-32 object-cover rounded-full border shadow" />
+                        <button @click.stop="removeAvatar"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+
                 <input v-model="form.username" placeholder="Username" class="input" />
                 <input v-model="form.email" type="email" placeholder="Email" class="input" />
                 <input v-model="form.password" type="password" placeholder="Password" class="input" />
@@ -74,8 +116,6 @@ watch(() => props.show, (val) => {
                     <option value="SELLER">Seller</option>
                     <option value="BUYER">Buyer</option>
                 </select>
-
-                <input type="file" accept="image/*" @change="handleFile" />
             </div>
 
             <!-- Footer -->

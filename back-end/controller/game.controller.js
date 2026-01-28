@@ -7,17 +7,15 @@ export const getGames = async (req, res) => {
     if (sort === 'price_asc') orderBy = { price: 'asc' }
     if (sort === 'price_desc') orderBy = { price: 'desc' }
 
-    const where = search
-        ? {
-            OR: [
-                { title: { contains: search } },
-                { description: { contains: search } }
-            ]
-        }
-        : {} // 🔥 ถ้า search ว่าง → ไม่ต้องใส่ where
-
     const games = await prisma.game.findMany({
-        where,
+        where: search
+            ? {
+                OR: [
+                    { title: { contains: search } },
+                    { description: { contains: search } }
+                ]
+            }
+            : {},
         include: {
             gameMedias: true,
             seller: {
@@ -29,10 +27,6 @@ export const getGames = async (req, res) => {
 
     res.json({ data: games })
 }
-
-
-
-
 export const getGameById = async (req, res) => {
     try {
         const id = Number(req.params.id)

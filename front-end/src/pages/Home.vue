@@ -1,113 +1,171 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import api from '@/services/api'
 
 import HomeHero from '@/components/home/HomeHero.vue'
-import GameCard from '@/components/home/GameCard.vue'
 import HomeFooter from '@/components/home/HomeFooter.vue'
 import Navbarpublic from '@/components/Navbarpublic.vue'
 
-const games = ref([])
-const loading = ref(false)
-const router = useRouter()
+import * as Icons from 'lucide-vue-next'
+import GameCard from '../components/Home/GameCard.vue'
 
-const fetchGames = async () => {
+/* ================= STATE ================= */
+const games = ref([])
+const categories = ref([])
+const activeCategory = ref('ALL')
+const loading = ref(false)
+
+const router = useRouter()
+const route = useRoute()
+
+const fetchGames = async (category = 'ALL') => {
     loading.value = true
     try {
-        const res = await api.get('/games')
+        const res = await api.get('/public/games', {
+            params: category !== 'ALL' ? { category } : {}
+        })
         games.value = res.data.data
     } catch (err) {
-        console.error('โหลดเกมไม่สำเร็จ', err)
+        console.error('❌ Fetch Error:', err)
     } finally {
         loading.value = false
     }
 }
-const goAllGames = () => {
-    router.push('/games')
+
+const fetchCategories = async () => {
+    try {
+        const res = await api.get('/public/categories')
+        categories.value = res.data.data
+    } catch (err) {
+        console.error('❌ Categories Error:', err)
+    }
 }
-onMounted(fetchGames)
+
+const filterByCategory = (id) => {
+    router.replace({
+        query: id !== 'ALL' ? { category: id } : {}
+    })
+}
 
 const viewGame = (game) => {
     router.push(`/games/${game.id}`)
 }
+
+onMounted(() => {
+    const categoryFromUrl = route.query.category || 'ALL'
+    activeCategory.value = categoryFromUrl
+    fetchCategories()
+})
+
+watch(
+    () => route.query.category,
+    (newCategory) => {
+        const cat = newCategory || 'ALL'
+        activeCategory.value = cat
+        fetchGames(cat)
+    },
+    { immediate: true }
+)
 </script>
+
 <template>
-    <div class="min-h-screen bg-[#020617] text-slate-200 selection:bg-indigo-500/30">
+    <div class="min-h-screen bg-[#FDFDFD] text-black selection:bg-black selection:text-white font-sans">
         <Navbarpublic />
         <HomeHero />
 
-        <section class="max-w-7xl mx-auto px-6 py-16 relative">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 blur-[100px] rounded-full"></div>
+        <main class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-24 relative">
 
-            <div class="flex items-end justify-between mb-10">
-                <div class="space-y-1">
-                    <div class="flex items-center gap-2 text-indigo-400 font-black uppercase tracking-[0.2em] text-xs">
-                        <span class="w-8 h-[2px] bg-indigo-500"></span>
-                        Marketplace
+            <div
+                class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 border-b border-zinc-100 pb-12">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="h-1 w-12 bg-black"></div>
+                        <span
+                            class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">คอลเลกชันดิจิตอล</span>
                     </div>
-                    <h3 class="text-4xl font-black text-white tracking-tighter italic">
-                        🔥 เกมยอดนิยมตอนนี้
+                    <h3 class="text-6xl font-black text-black tracking-tighter uppercase leading-[0.8]">
+                        <span class="text-black-300">หมวดหมู่</span>
                     </h3>
+                    <p class="text-zinc-400 text-sm font-medium tracking-wide max-w-xs uppercase">
+                        คัดสรรสุดยอดสินทรัพย์ดิจิทัลและสื่ออินเทอร์แอ็กทีฟ
+                    </p>
                 </div>
-                <RouterLink to="/games" class="relative z-10 hidden md:flex items-center gap-2 text-sm font-bold
-         text-slate-400 hover:text-white transition-colors
-         uppercase tracking-widest">
-                    ดูทั้งหมด
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-                    </svg>
-                </RouterLink>
+
+                <div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
+                    <button @click="filterByCategory('ALL')" class="category-btn"
+                        :class="activeCategory === 'ALL' ? 'active' : ''">
+                        ทั้งหมด
+                    </button>
+
+                    <button v-for="cat in categories" :key="cat.id" @click="filterByCategory(cat.name)"
+                        class="category-btn" :class="activeCategory === cat.name ? 'active' : ''">
+                        {{ cat.name }}
+                    </button>
+                </div>
             </div>
 
-            <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <div v-for="n in 8" :key="n"
-                    class="h-[400px] bg-white/5 rounded-[2rem] animate-pulse border border-white/5"></div>
+            <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+                <div v-for="n in 8" :key="n" class="space-y-4">
+                    <div class="aspect-[3/4] bg-zinc-100 rounded-[2.5rem] animate-pulse"></div>
+                    <div class="h-4 w-2/3 bg-zinc-100 rounded-full animate-pulse"></div>
+                    <div class="h-3 w-1/2 bg-zinc-50 rounded-full animate-pulse"></div>
+                </div>
             </div>
 
             <div v-else-if="games.length === 0"
-                class="text-center py-32 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                <div class="text-6xl mb-4 opacity-20">🎮</div>
-                <h3 class="text-xl font-bold text-slate-400 uppercase tracking-widest">ยังไม่มีเกมในคลังระบบ</h3>
-                <p class="text-slate-600 mt-2">โปรดกลับมาตรวจสอบใหม่อีกครั้งในภายหลัง</p>
+                class="text-center py-48 bg-zinc-50 rounded-[4rem] border border-dashed border-zinc-200">
+                <div class="text-4xl mb-6 grayscale opacity-20">📂</div>
+                <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">
+                    พื้นที่เก็บข้อมูลว่างเปล่าสำหรับหมวดหมู่นี้
+                </h3>
             </div>
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
                 <GameCard v-for="g in games" :key="g.id" :game="g" @view="viewGame"
-                    class="hover-effect transition-all duration-500" />
+                    class="transform transition-all duration-700 hover:-translate-y-4" />
             </div>
-        </section>
-
+        </main>
 
         <HomeFooter />
     </div>
 </template>
 
-
-
 <style scoped>
 @import "tailwindcss";
 
-.hover-effect:hover {
-    transform: translateY(-10px);
+.category-btn {
+    @apply px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 border border-zinc-100 whitespace-nowrap hover:bg-zinc-50 hover:border-zinc-300 text-zinc-400;
 }
 
-/* Custom Scrollbar สำหรับสายเกมมิ่ง */
-::-webkit-scrollbar {
-    width: 8px;
+.category-btn.active {
+    @apply bg-black text-white border-black shadow-2xl shadow-black/20 scale-105;
 }
 
-::-webkit-scrollbar-track {
-    background: #020617;
+/* Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
 
-::-webkit-scrollbar-thumb {
-    background: #1e1b4b;
-    border-radius: 10px;
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #312e81;
+/* นิ่งและแพงด้วยการค่อยๆ ปรากฎ */
+.grid {
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

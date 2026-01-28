@@ -29,13 +29,12 @@ export const createOrder = async (req, res) => {
             data: {
                 buyerId: userId,
                 totalPrice,
-                status: 'PAID', // digital = auto paid
+                status: 'PAID',
                 items: {
                     create: items
                 }
             }
         })
-
         res.status(201).json({ success: true, data: order })
     } catch (err) {
         console.error(err)
@@ -58,9 +57,6 @@ const hasPurchasedGame = async (userId, gameId) => {
 
     return !!item
 }
-
-
-
 export const myOrders = async (req, res) => {
     try {
         const orders = await prisma.order.findMany({

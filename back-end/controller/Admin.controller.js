@@ -1,13 +1,29 @@
 import prisma from "../config/client.js";
 import { deleteFile } from "../utils/file.js";
 import bcrypt from "bcryptjs";
-// ➕ CREATE
+import path from "path"
 export const createGame = async (req, res) => {
     try {
-        const { title, description, price, stock, status } = req.body
+        let {
+            title,
+            description,
+            price,
+            stock,
+            status,
+            categories
+        } = req.body
 
-        const image = req.files?.image?.[0]
-        const video = req.files?.video?.[0]
+        if (typeof categories === "string") {
+            categories = JSON.parse(categories)
+        }
+
+        const images = req.files?.images || []
+        const videos = req.files?.videos || []
+
+        console.log("🆕 CREATE GAME")
+        console.log("categories:", categories)
+        console.log("images:", images.length)
+        console.log("videos:", videos.length)
 
         const game = await prisma.game.create({
             data: {
@@ -18,20 +34,31 @@ export const createGame = async (req, res) => {
                 status,
                 sellerId: req.user.id,
 
+                categories: categories?.length
+                    ? {
+                        connect: categories.map(id => ({
+                            id: Number(id)
+                        }))
+                    }
+                    : undefined,
+
                 gameMedias: {
                     create: [
-                        ...(image ? [{
+                        ...images.map(f => ({
                             type: "IMAGE",
-                            url: `/uploads/games/images/${image.filename}`
-                        }] : []),
-                        ...(video ? [{
+                            url: `/uploads/games/images/${f.filename}`
+                        })),
+                        ...videos.map(f => ({
                             type: "VIDEO",
-                            url: `/uploads/games/videos/${video.filename}`
-                        }] : [])
+                            url: `/uploads/games/videos/${f.filename}`
+                        }))
                     ]
                 }
             },
-            include: { gameMedias: true }
+            include: {
+                gameMedias: true,
+                categories: true
+            }
         })
 
         res.status(201).json(game)
@@ -40,68 +67,110 @@ export const createGame = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
-
-
-// 📋 READ
 export const getAllGames = async (req, res) => {
     try {
+        const { category } = req.query
+
         const games = await prisma.game.findMany({
+            where: category
+                ? {
+                    categories: {
+                        some: {
+                            type: category   // ACTION / RPG / SPORT
+                        }
+                    }
+                }
+                : {},
             include: {
-                gameMedias: true
+                gameMedias: true,
+                categories: true
             },
             orderBy: { createdAt: "desc" }
         })
+
         res.json(games)
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
 }
-// ✏️ UPDATE
 export const updateGame = async (req, res) => {
     try {
         const { id } = req.params
-        const { title, description, price, stock, status } = req.body
+        let {
+            title,
+            description,
+            price,
+            stock,
+            status,
+            categories,
+            keepMediaIds
+        } = req.body
 
-        const image = req.files?.image?.[0]
-        const video = req.files?.video?.[0]
+        if (categories) categories = JSON.parse(categories)
+        if (keepMediaIds) keepMediaIds = JSON.parse(keepMediaIds)
 
+        const images = req.files?.images || []
+        const videos = req.files?.videos || []
+
+        console.log("✏️ UPDATE GAME:", id)
+        console.log("categories:", categories)
+        console.log("keepMediaIds:", keepMediaIds)
+        console.log("new images:", images.length)
+        console.log("new videos:", videos.length)
+
+        /* ================= DELETE MEDIA ================= */
+        if (Array.isArray(keepMediaIds)) {
+            await prisma.gameMedia.deleteMany({
+                where: {
+                    gameId: Number(id),
+                    id: { notIn: keepMediaIds }
+                }
+            })
+        }
+
+        /* ================= UPDATE GAME ================= */
         const game = await prisma.game.update({
             where: { id: Number(id) },
             data: {
                 title,
                 description,
-                price: price ? Number(price) : undefined,
-                stock: stock ? Number(stock) : undefined,
+                price: Number(price),
+                stock: Number(stock),
                 status,
 
-                ...(image || video ? {
-                    gameMedias: {
-                        deleteMany: {}, // ลบ media เก่าทั้งหมด
-                        create: [
-                            ...(image ? [{
-                                type: "IMAGE",
-                                url: `/uploads/games/images/${image.filename}`
-                            }] : []),
-                            ...(video ? [{
-                                type: "VIDEO",
-                                url: `/uploads/games/videos/${video.filename}`
-                            }] : [])
-                        ]
+                categories: categories
+                    ? {
+                        set: categories.map(id => ({
+                            id: Number(id)
+                        }))
                     }
-                } : {})
+                    : undefined,
+
+                gameMedias: {
+                    create: [
+                        ...images.map(f => ({
+                            type: "IMAGE",
+                            url: `/uploads/games/images/${f.filename}`
+                        })),
+                        ...videos.map(f => ({
+                            type: "VIDEO",
+                            url: `/uploads/games/videos/${f.filename}`
+                        }))
+                    ]
+                }
             },
-            include: { gameMedias: true }
+            include: {
+                gameMedias: true,
+                categories: true
+            }
         })
 
         res.json(game)
     } catch (err) {
-        console.error(err)
+        console.error("❌ UPDATE ERROR", err)
         res.status(500).json({ message: err.message })
     }
 }
-
-
-// 🗑️ DELETE
 export const deleteGame = async (req, res) => {
     try {
         const { id } = req.params
@@ -111,7 +180,7 @@ export const deleteGame = async (req, res) => {
         })
 
         for (const m of medias) {
-            deleteFile(m.url)
+            deleteFile(path.join(process.cwd(), m.url))
         }
 
         await prisma.gameMedia.deleteMany({
@@ -128,7 +197,6 @@ export const deleteGame = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
-
 
 // Dashboard 
 export const getAdminDashboard = async (req, res) => {
@@ -529,7 +597,6 @@ export const deleteUser = async (req, res) => {
     res.json({ message: "User deleted" })
 }
 // Order
-
 export const adminGetOrders = async (req, res) => {
     try {
         const orders = await prisma.order.findMany({
@@ -546,7 +613,8 @@ export const adminGetOrders = async (req, res) => {
                         game: {
                             select: {
                                 id: true,
-                                title: true
+                                title: true,
+
                             }
                         }
                     }
@@ -569,8 +637,6 @@ export const adminGetOrders = async (req, res) => {
         res.status(500).json({ message: "Failed to load orders" })
     }
 }
-
-
 export const adminGetOrderById = async (req, res) => {
     const id = Number(req.params.id)
 
@@ -599,8 +665,6 @@ export const adminGetOrderById = async (req, res) => {
         res.status(500).json({ message: "Failed to load order" })
     }
 }
-
-
 export const adminUpdateStatus = async (req, res) => {
     const id = Number(req.params.id)
     const { status } = req.body
@@ -622,8 +686,6 @@ export const adminUpdateStatus = async (req, res) => {
         res.status(500).json({ message: "Update status failed" })
     }
 }
-
-
 export const adminCompleteOrder = async (req, res) => {
     const id = Number(req.params.id)
 
@@ -665,7 +727,6 @@ export const adminCompleteOrder = async (req, res) => {
         })
     }
 }
-
 export const adminCancelOrder = async (req, res) => {
     const id = Number(req.params.id)
 
@@ -681,7 +742,166 @@ export const adminCancelOrder = async (req, res) => {
         res.status(500).json({ message: "Cancel order failed" })
     }
 }
+// Category
+export const adminCreateCategory = async (req, res) => {
+    try {
+        const { name } = req.body
 
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: "name and type are required"
+            })
+        }
+
+        const existsCategory = await prisma.category.findUnique({
+            where: { name }
+        })
+
+        if (existsCategory) {
+            return res.status(400).json({
+                success: false,
+                message: "ชื่อหมวดหมู่มีอยู่แล้ว"
+            })
+        }
+
+        const category = await prisma.category.create({
+            data: { name }
+        })
+
+        res.status(201).json({
+            success: true,
+            message: "Created category successfully",
+            data: category
+        })
+    } catch (error) {
+        console.error(error)
+
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        })
+    }
+}
+
+
+export const adminGetAllCategories = async (req, res) => {
+    try {
+        const categories = await prisma.category.findMany({
+            orderBy: { createdAt: "desc" }
+        })
+
+        res.status(200).json({
+            success: true,
+            data: categories
+        })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error" })
+    }
+}
+
+export const adminGetCategoryById = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const category = await prisma.category.findUnique({
+            where: { id: Number(id) }
+        })
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found"
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            data: category
+        })
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error" })
+    }
+}
+
+export const adminUpdateCategory = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, icon, type } = req.body
+
+        const category = await prisma.category.update({
+            where: { id: Number(id) },
+            data: {
+                ...(name && { name }),
+                ...(icon !== undefined && { icon }),
+                ...(type && { type })
+            }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Updated category successfully",
+            data: category
+        })
+    } catch (error) {
+        console.error(error)
+
+        if (error.code === "P2002") {
+            return res.status(400).json({
+                success: false,
+                message: "Category name already exists"
+            })
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Update failed"
+        })
+    }
+}
+
+export const adminDeleteCategory = async (req, res) => {
+    try {
+        const { id } = req.params
+        const categoryId = Number(id)
+
+        const category = await prisma.category.findUnique({
+            where: { id: categoryId }
+        })
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found"
+            })
+        }
+
+        // ✅ ตัด relation กับ game ก่อน
+        await prisma.category.update({
+            where: { id: categoryId },
+            data: {
+                games: {
+                    set: [] // clear many-to-many
+                }
+            }
+        })
+
+        await prisma.category.delete({
+            where: { id: categoryId }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Deleted category successfully"
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        })
+    }
+}
 
 
 

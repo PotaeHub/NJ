@@ -1,21 +1,21 @@
 import { Router } from 'express'
 import { auth } from '../middleware/auth.middleware.js'
-import { adminCancelOrder, adminCompleteOrder, adminGetOrderById, adminGetOrders, adminUpdateStatus, confirmPayment, createGame, createUser, deleteGame, deleteUser, getAdminDashboard, getAllGames, getOrders, getUsers, orderMy, toggleBanUser, updateGame, updateRole, updateUser } from '../controller/Admin.controller.js'
+import { adminCancelOrder, adminCompleteOrder, adminCreateCategory, adminDeleteCategory, adminGetAllCategories, adminGetCategoryById, adminGetOrderById, adminGetOrders, adminUpdateCategory, adminUpdateStatus, confirmPayment, createGame, createUser, deleteGame, deleteUser, getAdminDashboard, getAllGames, getOrders, getUsers, orderMy, toggleBanUser, updateGame, updateRole, updateUser } from '../controller/Admin.controller.js'
 import { Roles } from '../middleware/checkRole.js'
 import { uploadGameMedia } from '../middleware/upload.middleware.js'
 const router = Router()
 
 // Games
 router.post('/admin/games', auth, Roles("ADMIN"), uploadGameMedia.fields([
-    { name: "image", maxCount: 1 },
-    { name: "video", maxCount: 1 }
+    { name: "images", maxCount: 10 },
+    { name: "videos", maxCount: 5 }
 ]), createGame)
 
 router.get('/admin/games', auth, Roles("ADMIN"), getAllGames)
 
 router.put('/admin/games/:id', auth, Roles("ADMIN"), uploadGameMedia.fields([
-    { name: "image", maxCount: 1 },
-    { name: "video", maxCount: 1 }
+    { name: "images", maxCount: 10 },
+    { name: "videos", maxCount: 5 }
 ]), updateGame)
 
 router.delete('/admin/games/:id', auth, Roles("ADMIN"), deleteGame)
@@ -37,4 +37,28 @@ router.patch("/admin/orders/:id/status", auth, Roles("ADMIN"), adminUpdateStatus
 router.patch("/admin/orders/:id/complete", auth, Roles("ADMIN"), adminCompleteOrder)
 router.patch("/admin/orders/:id/cancel", auth, Roles("ADMIN"), adminCancelOrder)
 
+// Category 
+router.post("/admin/category", auth, Roles("ADMIN"), adminCreateCategory)
+router.get("/admin/category", auth, Roles("ADMIN"), adminGetAllCategories)
+
+router.get(
+    '/admin/category/:id',
+    auth,
+    Roles('ADMIN'),
+    adminGetCategoryById
+)
+
+router.put(
+    '/admin/category/:id',
+    auth,
+    Roles('ADMIN'),
+    adminUpdateCategory
+)
+
+router.delete(
+    '/admin/category/:id',
+    auth,
+    Roles('ADMIN'),
+    adminDeleteCategory
+)
 export default router

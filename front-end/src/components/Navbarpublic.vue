@@ -25,107 +25,104 @@ const logout = () => {
     <nav :class="[
         'fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-6',
         isScrolled
-            ? 'bg-[#020617]/95 backdrop-blur-xl border-b border-white/10 shadow-lg py-3'
-            : 'bg-[#020617]/85 backdrop-blur-xl border-b border-white/5 py-4'
+            ? 'bg-white/80 backdrop-blur-xl border-b border-zinc-100 py-3 shadow-sm'
+            : 'bg-transparent py-5'
     ]">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
 
+            <!-- Logo -->
             <router-link to="/" class="flex items-center gap-3 group">
                 <div
-                    class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:rotate-12 transition-transform">
-                    <span class="text-white text-xl font-black">N</span>
+                    class="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-lg transition-transform group-hover:rotate-6">
+                    <span class="text-white text-xl font-black italic">N</span>
                 </div>
                 <div class="leading-none">
-                    <span class="text-xl font-black text-white tracking-tighter uppercase block">NJ GAMING</span>
-                    <span class="text-[10px] font-bold text-indigo-400 tracking-[0.2em] uppercase">Storefront</span>
+                    <span class="text-xl font-black text-black tracking-tighter uppercase block">NJ SHOP</span>
                 </div>
             </router-link>
 
+            <!-- Navigation Links -->
             <div class="flex items-center gap-2 md:gap-6">
 
+                <!-- Guest State -->
                 <template v-if="!auth.user">
                     <router-link to="/login"
-                        class="text-sm font-bold text-slate-300 hover:text-white transition-colors">
-                        Login
+                        class="text-xs font-black text-zinc-500 hover:text-black uppercase tracking-widest transition-colors px-3">
+                        ล็อกอิน
                     </router-link>
                     <router-link to="/register"
-                        class="bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
-                        Get Started
+                        class="bg-black hover:bg-zinc-800 px-6 py-2.5 rounded-full text-xs font-black text-white uppercase tracking-widest transition-all shadow-lg shadow-black/10 active:scale-95">
+                        สมัครสมาชิก
                     </router-link>
                 </template>
 
+                <!-- Buyer State -->
                 <template v-else-if="auth.user.role === 'BUYER'">
-                    <div class="hidden md:flex items-center gap-6 mr-4 border-r border-white/10 pr-6">
+                    <div class="hidden md:flex items-center gap-8 mr-4 border-r border-zinc-100 pr-8">
                         <router-link to="/" class="nav-link">หน้าแรก</router-link>
                         <router-link to="/buyer/games" class="nav-link">คลัง</router-link>
-                        <router-link to="/buyer/orders" class="nav-link">รายการ</router-link>
+                        <router-link to="/buyer/orders" class="nav-link">รายการสั่งซื้อ</router-link>
                     </div>
 
                     <router-link to="/buyer/profile"
-                        class="flex items-center gap-3 group bg-white/5 p-1.5 pr-4 rounded-2xl border border-white/10 hover:border-indigo-500/50 transition-all">
-                        <div class="w-8 h-8 rounded-xl overflow-hidden
-         bg-gradient-to-br from-indigo-500 to-purple-600
-         flex items-center justify-center
-         text-xs font-black text-white shadow-inner">
-
-                            <!-- ถ้ามี avatar -->
+                        class="flex items-center gap-3 group bg-zinc-50 p-1.5 pr-4 rounded-full border border-zinc-200 hover:border-black transition-all">
+                        <div
+                            class="w-8 h-8 rounded-full overflow-hidden bg-black flex items-center justify-center text-[10px] font-black text-white shadow-inner">
                             <img v-if="auth.user?.avatar" :src="BASE_URL + auth.user.avatar"
                                 class="w-full h-full object-cover" />
-
-                            <!-- ถ้าไม่มี avatar -->
-                            <span v-else>
-                                {{ auth.user?.username?.[0]?.toUpperCase() }}
-                            </span>
+                            <span v-else>{{ auth.user?.username?.[0]?.toUpperCase() }}</span>
                         </div>
-
-                        <span class="text-sm font-bold text-slate-200 group-hover:text-white">{{ auth.user.username
-                            }}</span>
+                        <span
+                            class="text-xs font-black text-zinc-600 group-hover:text-black uppercase tracking-tight">{{
+                                auth.user.username }}</span>
                     </router-link>
                 </template>
 
+                <!-- Seller State -->
                 <template v-else-if="auth.user.role === 'SELLER'">
                     <router-link to="/seller"
-                        class="nav-link-special text-emerald-400 border-emerald-500/20 bg-emerald-500/5">
-                        Seller Hub
+                        class="nav-link-special border-dashed border-zinc-300 text-black hover:bg-black hover:text-white">
+                        ศูนย์กลางผู้ขายห
                     </router-link>
                     <router-link to="/profile"
-                        class="text-sm font-bold text-slate-300 hover:text-white underline underline-offset-8 decoration-indigo-500">
+                        class="text-xs font-black text-black uppercase tracking-widest px-2 underline underline-offset-4">
                         {{ auth.user.username }}
                     </router-link>
                 </template>
 
+                <!-- Admin State -->
                 <template v-else-if="auth.user.role === 'ADMIN'">
                     <div class="hidden lg:flex items-center gap-4 mr-2">
-                        <router-link to="/admin/dashboard" class="nav-link text-xs">Console</router-link>
-                        <router-link to="/admin/users" class="nav-link text-xs">Users</router-link>
+                        <router-link to="/admin/dashboard" class="nav-link">ควมคุม</router-link>
                     </div>
-                    <router-link to="/profile"
-                        class="text-sm font-black text-rose-400 bg-rose-500/10 px-4 py-2 rounded-lg border border-rose-500/20">
-                        ADMIN: {{ auth.user.username }}
+                    <router-link to="/admin/dashboard"
+                        class="text-[10px] font-black text-white bg-black px-4 py-2 rounded-lg tracking-[0.2em] uppercase">
+                        Admin: {{ auth.user.username }}
                     </router-link>
                 </template>
 
+                <!-- Logout Button -->
                 <button v-if="auth.user" @click="logout"
-                    class="p-2.5 rounded-xl bg-white/5 text-slate-400 hover:bg-rose-600/10 hover:text-rose-500 transition-all border border-white/5 hover:border-rose-500/20"
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-zinc-400 hover:bg-rose-50 hover:text-rose-500 transition-all border border-transparent hover:border-rose-100"
                     title="Logout">
-                    ➜]
+                    <span class="text-lg">➜</span>
                 </button>
             </div>
         </div>
     </nav>
-    <div class="h-[72px]"></div>
+    <div class="h-[80px]"></div>
 </template>
 
 <style scoped>
 @import "tailwindcss";
 
 .nav-link {
-    @apply text-sm font-bold text-slate-400 hover:text-white transition-all relative py-2 px-1;
+    @apply text-[11px] font-black text-zinc-400 hover:text-black uppercase tracking-[0.15em] transition-all relative py-2;
 }
 
 .nav-link::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-[2px] bg-indigo-500 transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300;
 }
 
 .nav-link:hover::after,
@@ -134,10 +131,10 @@ const logout = () => {
 }
 
 .router-link-active.nav-link {
-    @apply text-white;
+    @apply text-black;
 }
 
 .nav-link-special {
-    @apply px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shadow-current/5;
+    @apply px-5 py-2 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all active:scale-95;
 }
 </style>

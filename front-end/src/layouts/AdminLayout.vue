@@ -97,7 +97,8 @@ const navLinks = [
   { name: "Dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Games", to: "/admin/games", icon: Gamepad2 },
   { name: "Users", to: "/admin/users", icon: Users },
-  { name: "Orders", to: "/admin/orders", icon: ShoppingBag }
+  { name: "Orders", to: "/admin/orders", icon: ShoppingBag },
+  { name: "Categories", to: "/admin/category", icon: ShoppingBag }
 ]
 
 const logout = () => {
