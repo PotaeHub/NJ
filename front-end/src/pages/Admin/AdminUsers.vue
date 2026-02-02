@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from "vue"
 import api from "@/services/api"
 import { useAuthStore } from "@/store/auth"
-import { UserPlus, Users, ShieldCheck, Search } from 'lucide-vue-next'
+import { UserPlus, Users, Search } from 'lucide-vue-next'
 
 import UserSearch from "@/components/admin/users/UserSearch.vue"
 import UserTable from "@/components/admin/users/UserTable.vue"
@@ -33,7 +33,7 @@ const loadUsers = async () => {
         const res = await api.get("/admin/users")
         users.value = res.data
     } catch (err) {
-        console.error("Fetch error:", err)
+        console.error(err)
     } finally {
         loading.value = false
     }
@@ -43,32 +43,41 @@ const loadUsers = async () => {
 const filteredUsers = computed(() =>
     users.value.filter(u => {
         const kw = keyword.value.toLowerCase()
-        const matchKeyword = u.username.toLowerCase().includes(kw) || u.email.toLowerCase().includes(kw)
-        const matchStatus = statusFilter.value === "ALL" ||
+        const matchKeyword =
+            u.username.toLowerCase().includes(kw) ||
+            u.email.toLowerCase().includes(kw)
+
+        const matchStatus =
+            statusFilter.value === "ALL" ||
             (statusFilter.value === "ACTIVE" && !u.banned) ||
             (statusFilter.value === "BANNED" && u.banned)
+
         return matchKeyword && matchStatus
     })
 )
 
 /* ================= ACTIONS ================= */
 const openCreate = () => showCreate.value = true
+
 const submitCreate = async (data) => {
     if (loading.value) return
     loading.value = true
     try {
-        await api.post("/admin/users", data, { headers: { "Content-Type": "multipart/form-data" } })
+        await api.post("/admin/users", data, {
+            headers: { "Content-Type": "multipart/form-data" }
+        })
         showCreate.value = false
         loadUsers()
-    } catch (err) {
-        alert(err.response?.data?.message || "Create user failed")
-    } finally { loading.value = false }
+    } finally {
+        loading.value = false
+    }
 }
 
 const openEdit = (user) => {
     selectedUser.value = user
     showEdit.value = true
 }
+
 const submitEdit = async (data) => {
     await api.put(`/admin/users/${selectedUser.value.id}`, data)
     showEdit.value = false
@@ -79,6 +88,7 @@ const openDelete = (user) => {
     selectedUser.value = user
     showDelete.value = true
 }
+
 const confirmDelete = async () => {
     await api.delete(`/admin/users/${selectedUser.value.id}`)
     showDelete.value = false
@@ -90,6 +100,7 @@ const openBan = (user) => {
     selectedUser.value = user
     showBan.value = true
 }
+
 const confirmBan = async () => {
     await api.put(`/admin/users/${selectedUser.value.id}/ban`)
     showBan.value = false
@@ -100,73 +111,104 @@ onMounted(loadUsers)
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#FDFDFD] text-black font-sans p-6 lg:p-12 space-y-12">
+    <div class="min-h-screen bg-[#70707013] text-zinc-800 p-6 lg:p-12 relative overflow-hidden">
 
-        <header
-            class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-zinc-100 pb-10">
-            <div class="space-y-1">
-                <div class="flex items-center gap-4 mb-2">
-                    <div class="p-3 bg-black text-white rounded-2xl shadow-xl shadow-black/10">
-                        <Users :size="28" stroke-width="2.5" />
+        <!-- Glow -->
+        <div
+            class="fixed -top-40 -left-40 w-[600px] h-[600px] bg-blue-400/10 blur-[140px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto space-y-12 relative z-10">
+
+            <!-- HEADER -->
+            <header
+                class="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b border-zinc-200 pb-10">
+
+                <div class="flex items-center gap-5">
+                    <div class="p-4 bg-blue-600 text-white rounded-2xl shadow-lg rotate-3">
+                        <Users :size="30" stroke-width="2.5" />
                     </div>
-                    <h1 class="text-4xl font-black tracking-tighter uppercase">การลงทะเบียนผู้ใช้</h1>
+
+                    <div>
+                        <h1 class="text-4xl font-black tracking-tight uppercase italic">
+                            Citizen <span class="text-blue-600">Matrix</span>
+                        </h1>
+                        <p class="text-zinc-500 text-xs font-semibold tracking-widest mt-1">
+                            User Management System
+                        </p>
+                    </div>
                 </div>
-                <div class="h-1 w-12 bg-black ml-1"></div>
-                <p class="text-zinc-400 text-sm font-medium tracking-wide ml-1 uppercase">การตรวจสอบสิทธิ์และการอนุญาต
-                    การควบคุม</p>
-            </div>
 
-            <button @click="openCreate"
-                class="group flex items-center gap-3 bg-black text-white font-black px-8 py-4 rounded-2xl shadow-2xl shadow-black/20 transition-all active:scale-95 hover:bg-zinc-800 tracking-widest text-[10px] uppercase">
-                <UserPlus class="h-4 w-4" stroke-width="3" />
-                เชิญสมาชิกใหม่
-            </button>
-        </header>
+                <button @click="openCreate" class="flex items-center gap-4 bg-blue-600 text-white font-bold px-8 py-4 rounded-2xl
+                           shadow-lg hover:bg-blue-700 active:scale-95 transition">
+                    <UserPlus class="w-4 h-4" />
+                    เพิ่มผู้ใช้งาน
+                </button>
+            </header>
 
-        <section class="grid grid-cols-1 gap-6">
-            <div class="bg-white p-2 rounded-3xl border border-zinc-100 shadow-sm">
-                <UserSearch v-model:keyword="keyword" v-model:status="statusFilter" />
-            </div>
-        </section>
-
-        <main
-            class="bg-white rounded-[2.5rem] border border-zinc-100 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] overflow-hidden">
-            <UserTable :users="filteredUsers" @edit="openEdit" @delete="openDelete" @toggle-ban="openBan" />
-
-            <div v-if="filteredUsers.length === 0 && !loading" class="py-32 text-center">
-                <div class="inline-flex p-6 bg-zinc-50 rounded-full mb-4 text-zinc-200">
-                    <Search :size="40" />
+            <!-- SEARCH -->
+            <section>
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <UserSearch v-model:keyword="keyword" v-model:status="statusFilter" />
                 </div>
-                <p class="font-black text-zinc-300 uppercase tracking-[0.3em] text-[10px]">
-                    ไม่พบข้อมูลที่ตรงกันในฐานข้อมูล
-                </p>
-            </div>
-        </main>
+            </section>
 
+            <!-- TABLE -->
+            <main class="bg-white rounded-3xl border border-zinc-200 shadow-lg overflow-hidden relative min-h-[400px]">
+
+                <div v-if="loading"
+                    class="absolute inset-0 z-50 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+                    <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin">
+                    </div>
+                </div>
+
+                <UserTable :users="filteredUsers" @edit="openEdit" @delete="openDelete" @toggle-ban="openBan" />
+
+                <div v-if="filteredUsers.length === 0 && !loading" class="py-32 text-center text-zinc-400">
+                    <Search :size="48" class="mx-auto mb-4" />
+                    <p class="text-xs tracking-widest uppercase font-semibold">
+                        No matching user found
+                    </p>
+                </div>
+            </main>
+        </div>
+
+        <!-- MODALS -->
         <UserCreateModal :show="showCreate" @close="showCreate = false" @submit="submitCreate" />
-
         <UserEditModal :show="showEdit" :user="selectedUser" @close="showEdit = false" @submit="submitEdit" />
-
         <UserDeleteModal :show="showDelete" :user="selectedUser" :currentUserId="auth.user?.id"
             @close="showDelete = false" @confirm="confirmDelete" />
-
         <BanConfirmModal :show="showBan" :user="selectedUser" @close="showBan = false" @confirm="confirmBan" />
-
     </div>
 </template>
 
 <style scoped>
 @import "tailwindcss";
 
+/* Header Table */
 :deep(.user-table-header) {
-    @apply bg-zinc-50/50 text-zinc-400 font-black uppercase tracking-[0.2em] text-[10px];
+    @apply bg-zinc-50 text-zinc-500 font-bold uppercase tracking-widest text-[10px] border-b border-zinc-200;
 }
 
+/* Status Badge */
 :deep(.status-badge-active) {
-    @apply bg-black text-white px-3 py-1 rounded-lg font-black text-[9px] uppercase tracking-widest;
+    @apply bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-200;
 }
 
 :deep(.status-badge-banned) {
-    @apply bg-zinc-100 text-zinc-400 px-3 py-1 rounded-lg font-black text-[9px] uppercase tracking-widest;
+    @apply bg-rose-50 text-rose-600 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-rose-200;
+}
+
+/* Table Row */
+:deep(tr) {
+    @apply border-b border-zinc-200 transition;
+}
+
+:deep(tr:hover) {
+    @apply bg-blue-50/40;
+}
+
+:deep(td) {
+    @apply py-5 px-6;
 }
 </style>

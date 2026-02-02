@@ -1,113 +1,130 @@
 <template>
-    <div class="min-h-screen bg-[#FDFDFD] text-black font-sans selection:bg-black selection:text-white p-6 lg:p-12">
+    <div
+        class="min-h-screen bg-[#050505] text-white font-sans selection:bg-blue-500/30 p-6 lg:p-12 relative overflow-hidden">
 
-        <!-- Header Section -->
-        <div class="max-w-7xl mx-auto space-y-12">
-            <header class="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-zinc-100 pb-10">
-                <div class="space-y-3">
+        <div
+            class="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none">
+        </div>
+        <div
+            class="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="max-w-7xl mx-auto space-y-12 relative z-10">
+            <header class="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/5 pb-10">
+                <div class="space-y-4">
                     <div
-                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200">
-                        <div class="w-1.5 h-1.5 rounded-full bg-black animate-pulse"></div>
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">System Live
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-blue-400">Live Neural
                             Analysis</span>
                     </div>
-                    <h1 class="text-5xl font-black tracking-tight uppercase leading-none">การวิเคราะห์<br /><span
-                            class="text-zinc-400">แพลตฟอร์ม</span></h1>
-                    <p class="text-zinc-400 text-sm font-medium tracking-wide max-w-md">
-                        ตรวจสอบประสิทธิภาพเชิงกลยุทธ์และการเติบโตของระบบแบบ Real-time</p>
+                    <h1 class="text-6xl font-black tracking-tighter uppercase italic leading-none">
+                        DATA <span class="text-blue-500">INSIGHTS</span>
+                    </h1>
+                    <p class="text-zinc-500 text-xs font-bold tracking-[0.2em] uppercase max-w-md italic">
+                        Strategic performance and real-time ecosystem growth
+                    </p>
                 </div>
+
                 <button @click="refreshAll"
-                    class="group flex items-center gap-3 px-8 py-4 bg-black text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-zinc-800 transition-all active:scale-95 shadow-2xl shadow-black/10">
-                    <span>รีเฟรชข้อมูล</span>
-                    <span class="group-hover:rotate-180 transition-transform duration-500 text-lg">↻</span>
+                    class="group flex items-center gap-4 px-10 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-blue-500 hover:text-white transition-all active:scale-95 shadow-[0_20px_40px_-10px_rgba(255,255,255,0.1)]">
+                    <span>Synchronize Data</span>
+                    <RefreshCw class="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" />
                 </button>
             </header>
 
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="summary-card group">
-                    <div class="flex justify-between items-start mb-6">
-                        <div
-                            class="p-3 bg-zinc-50 rounded-xl group-hover:bg-black group-hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <span
-                            class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic group-hover:text-black">Revenue</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="summary-card group relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
-                    <p class="label">รายได้รวม</p>
-                    <p class="value italic">฿{{ format(summary.revenue) }}</p>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-8">
+                            <div
+                                class="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-blue-500/50 transition-all">
+                                <DollarSign class="w-5 h-5 text-blue-500" />
+                            </div>
+                            <TrendingUp class="w-4 h-4 text-emerald-500 opacity-50" />
+                        </div>
+                        <p class="label">Gross Revenue</p>
+                        <p class="value italic text-white group-hover:text-blue-400 transition-colors">฿{{
+                            format(summary.revenue) }}</p>
+                    </div>
                 </div>
 
-                <div class="summary-card group">
-                    <div class="flex justify-between items-start mb-6">
-                        <div
-                            class="p-3 bg-zinc-50 rounded-xl group-hover:bg-black group-hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </div>
-                        <span
-                            class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic group-hover:text-black">Users</span>
+                <div class="summary-card group relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
-                    <p class="label">ผู้ใช้งานทั้งหมด</p>
-                    <p class="value italic">{{ format(summary.users) }} <span
-                            class="text-sm text-zinc-400 font-medium tracking-normal">Account</span></p>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-8">
+                            <div
+                                class="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-indigo-500/50 transition-all">
+                                <Users class="w-5 h-5 text-indigo-500" />
+                            </div>
+                            <Activity class="w-4 h-4 text-blue-500 opacity-50" />
+                        </div>
+                        <p class="label">Network Citizens</p>
+                        <p class="value italic text-white">{{ format(summary.users) }} <span
+                                class="text-sm text-zinc-600 font-bold uppercase tracking-widest">Units</span></p>
+                    </div>
                 </div>
 
-                <div class="summary-card group">
-                    <div class="flex justify-between items-start mb-6">
-                        <div
-                            class="p-3 bg-zinc-50 rounded-xl group-hover:bg-black group-hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                        </div>
-                        <span
-                            class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic group-hover:text-black">Orders</span>
+                <div class="summary-card group relative overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
-                    <p class="label">ออเดอร์ทั้งหมด</p>
-                    <p class="value italic">{{ format(summary.orders) }} <span
-                            class="text-sm text-zinc-400 font-medium tracking-normal">Trades</span></p>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-8">
+                            <div
+                                class="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-purple-500/50 transition-all">
+                                <ShoppingBag class="w-5 h-5 text-purple-500" />
+                            </div>
+                            <Zap class="w-4 h-4 text-amber-500 opacity-50" />
+                        </div>
+                        <p class="label">Trade Operations</p>
+                        <p class="value italic text-white">{{ format(summary.orders) }} <span
+                                class="text-sm text-zinc-600 font-bold uppercase tracking-widest">Logs</span></p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Doughnut Chart (Smaller Span) -->
-                <section class="chart-card lg:col-span-4">
+                <section class="chart-card lg:col-span-4 group hover:border-blue-500/30 transition-all">
                     <div class="chart-header">
-                        <h2>การกระจายคำสั่งซื้อ</h2>
-                        <div class="w-2 h-2 rounded-full bg-zinc-200"></div>
-                    </div>
-                    <div class="canvas-container !h-[280px]"><canvas ref="orderStatusChart" /></div>
-                </section>
-
-                <!-- Bar Charts (Larger Span) -->
-                <section class="chart-card lg:col-span-8">
-                    <div class="chart-header">
-                        <h2>ชื่อเกมระดับท็อป (ยอดขายสูงสุด)</h2>
-                        <span class="text-[10px] font-bold text-zinc-400">RANKING</span>
-                    </div>
-                    <div class="canvas-container !h-[280px]"><canvas ref="topGamesChart" /></div>
-                </section>
-
-                <section class="chart-card lg:col-span-12">
-                    <div class="chart-header">
-                        <h2>พ่อค้าระดับพรีเมียมที่มีประสิทธิภาพสูงสุด</h2>
-                        <div class="flex gap-2">
-                            <div class="w-8 h-1 bg-black"></div>
-                            <div class="w-8 h-1 bg-zinc-100"></div>
+                        <div class="flex items-center gap-3">
+                            <PieChart class="w-4 h-4 text-blue-500" />
+                            <h2>Order Distribution</h2>
                         </div>
                     </div>
-                    <div class="canvas-container !h-[320px]"><canvas ref="topSellersChart" /></div>
+                    <div class="canvas-container h-[300px] mt-4"><canvas ref="orderStatusChart" /></div>
+                </section>
+
+                <section class="chart-card lg:col-span-8 group hover:border-blue-500/30 transition-all">
+                    <div class="chart-header">
+                        <div class="flex items-center gap-3">
+                            <BarChart3 class="w-4 h-4 text-blue-500" />
+                            <h2>Top Performing Assets (Sales)</h2>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-zinc-600 uppercase tracking-widest border border-white/5 px-2 py-1 rounded-md">Realtime
+                            Ranking</span>
+                    </div>
+                    <div class="canvas-container h-[300px] mt-4"><canvas ref="topGamesChart" /></div>
+                </section>
+
+                <section class="chart-card lg:col-span-12 group hover:border-blue-500/30 transition-all">
+                    <div class="chart-header">
+                        <div class="flex items-center gap-3">
+                            <ShieldCheck class="w-4 h-4 text-blue-500" />
+                            <h2>Elite Merchant Efficiency</h2>
+                        </div>
+                        <div class="flex gap-1">
+                            <div class="w-12 h-1 bg-blue-600 rounded-full"></div>
+                            <div class="w-4 h-1 bg-white/10 rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="canvas-container h-[350px] mt-4"><canvas ref="topSellersChart" /></div>
                 </section>
             </div>
         </div>
@@ -117,35 +134,46 @@
 <style scoped>
 @import "tailwindcss";
 
+.summary-card {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/5 p-8 rounded-[2.5rem] transition-all duration-500;
+}
+
+.chart-card {
+    @apply bg-[#0a0a0b] border border-white/5 p-10 rounded-[2.5rem] shadow-2xl;
+}
+
 .label {
-    @apply text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-1;
+    @apply text-[10px] font-black uppercase tracking-[0.4em] text-zinc-600 mb-2 italic;
 }
 
 .value {
-    @apply text-4xl font-black tracking-tighter text-black;
+    @apply text-5xl font-black tracking-tighter;
 }
 
 .chart-header {
-    @apply flex justify-between items-center mb-10;
+    @apply flex justify-between items-center mb-6;
 }
 
 .chart-header h2 {
-    @apply text-xs font-black uppercase tracking-[0.2em] text-zinc-800;
+    @apply text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 italic;
 }
 
 .canvas-container {
-    @apply w-full;
+    @apply w-full relative;
 }
 </style>
-
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import Chart from 'chart.js/auto'
+import {
+    RefreshCw, DollarSign, Users, ShoppingBag,
+    TrendingUp, Activity, Zap, PieChart, BarChart3, ShieldCheck
+} from 'lucide-vue-next'
 
 /* =========================
-   REFS
+   REFS & CONFIG
 ========================= */
 const orderStatusChart = ref()
 const topGamesChart = ref()
@@ -154,31 +182,14 @@ const topSellersChart = ref()
 const summary = ref({ revenue: 0, users: 0, orders: 0 })
 let charts = []
 
-/* =========================
-   UTILS
-========================= */
 const format = (n) => new Intl.NumberFormat('th-TH').format(n || 0)
 
-/* =========================
-   COLOR PALETTES
-========================= */
 const palette = {
-    primary: '#6366f1',   // indigo
-    success: '#22c55e',   // green
-    warning: '#f59e0b',   // amber
-    danger: '#ef4444',    // red
-    info: '#0ea5e9',      // sky
-    dark: '#020617',
-    gray: '#94a3b8'
+    primary: '#3b82f6',   // Blue
+    accent: '#6366f1',    // Indigo
+    glow: 'rgba(59, 130, 246, 0.5)',
+    dark: '#050505'
 }
-
-const doughnutColors = [
-    palette.primary,
-    palette.success,
-    palette.warning,
-    palette.danger,
-    palette.info
-]
 
 /* =========================
    CHART FACTORY
@@ -187,18 +198,25 @@ const createChart = (el, type, labels, data, isDoughnut = false) => {
     if (!el) return
     const ctx = el.getContext('2d')
 
+    // Create Gradient for Bars
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400)
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 1)')
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.1)')
+
     const chart = new Chart(ctx, {
         type,
         data: {
             labels,
             datasets: [{
                 data,
-                backgroundColor: isDoughnut ? doughnutColors : palette.primary,
-                borderColor: '#ffffff',
-                borderWidth: isDoughnut ? 2 : 0,
-                borderRadius: type === 'bar' ? 12 : 0,
-                hoverBackgroundColor: palette.info,
-                tension: 0.4
+                backgroundColor: isDoughnut ?
+                    ['#3b82f6', '#6366f1', '#a855f7', '#ec4899', '#f43f5e'] : gradient,
+                borderColor: isDoughnut ? '#0a0a0b' : '#3b82f6',
+                borderWidth: isDoughnut ? 5 : 2,
+                borderRadius: type === 'bar' ? 15 : 0,
+                hoverBackgroundColor: '#ffffff',
+                tension: 0.4,
+                fill: true
             }]
         },
         options: {
@@ -209,45 +227,33 @@ const createChart = (el, type, labels, data, isDoughnut = false) => {
                     display: isDoughnut,
                     position: 'bottom',
                     labels: {
-                        boxWidth: 10,
-                        padding: 20,
-                        color: palette.dark,
-                        font: {
-                            size: 11,
-                            weight: 'bold'
-                        }
+                        boxWidth: 8,
+                        usePointStyle: true,
+                        padding: 25,
+                        color: '#71717a',
+                        font: { size: 9, weight: '900', family: 'Inter' }
                     }
                 },
                 tooltip: {
-                    backgroundColor: '#020617',
-                    titleColor: '#fff',
-                    bodyColor: '#e5e7eb',
-                    padding: 12,
-                    cornerRadius: 12
+                    backgroundColor: '#111',
+                    padding: 15,
+                    titleFont: { size: 12, weight: 'bold' },
+                    cornerRadius: 15,
+                    displayColors: false
                 }
             },
             scales: isDoughnut ? {} : {
                 y: {
-                    grid: {
-                        color: '#f1f5f9',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        color: palette.gray,
-                        font: { size: 11, weight: 'bold' }
-                    }
+                    grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+                    ticks: { color: '#52525b', font: { size: 10, weight: 'bold' } }
                 },
                 x: {
                     grid: { display: false },
-                    ticks: {
-                        color: palette.gray,
-                        font: { size: 11, weight: 'bold' }
-                    }
+                    ticks: { color: '#52525b', font: { size: 9, weight: '900' } }
                 }
             }
         }
     })
-
     charts.push(chart)
 }
 
@@ -260,14 +266,13 @@ const loadAll = async () => {
 
     try {
         const { data } = await api.get('/admin/dashboard')
-
         summary.value = data.summary
         const a = data.analytics
 
         createChart(
             orderStatusChart.value,
             'doughnut',
-            a.orderStatus.map(i => i.status),
+            a.orderStatus.map(i => i.status.toUpperCase()),
             a.orderStatus.map(i => i.count),
             true
         )
@@ -275,26 +280,21 @@ const loadAll = async () => {
         createChart(
             topGamesChart.value,
             'bar',
-            a.topGames.map(i => i.game),
+            a.topGames.map(i => i.game.toUpperCase()),
             a.topGames.map(i => i.total)
         )
 
         createChart(
             topSellersChart.value,
             'bar',
-            a.topSellers.map(i => i.seller),
+            a.topSellers.map(i => i.seller.toUpperCase()),
             a.topSellers.map(i => i.total)
         )
-
     } catch (e) {
         console.error(e)
     }
 }
 
-/* =========================
-   ACTIONS
-========================= */
 const refreshAll = () => loadAll()
-
 onMounted(loadAll)
 </script>

@@ -13,9 +13,11 @@ const storage = multer.diskStorage({
 
         let dir = "uploads";
 
-        /* 🔥 แยกจาก field name */
         if (file.fieldname === "avatar") {
             dir += "/avatar";
+        }
+        else if (file.fieldname === "slip") {
+            dir += "/slips";
         }
         else if (file.mimetype.startsWith("image")) {
             dir += "/games/images";
@@ -28,6 +30,7 @@ const storage = multer.diskStorage({
         cb(null, dir);
     },
 
+
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);
         const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
@@ -36,6 +39,14 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
+
+    if (file.fieldname === "slip") {
+        if (!file.mimetype.startsWith("image")) {
+            return cb(new Error("Slip must be an image"), false);
+        }
+        return cb(null, true);
+    }
+
     if (
         file.mimetype.startsWith("image") ||
         file.mimetype.startsWith("video")
@@ -45,6 +56,7 @@ const fileFilter = (req, file, cb) => {
         cb(new Error("Only image & video allowed"), false);
     }
 };
+
 
 export const uploadGameMedia = multer({
     storage,

@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch } from "vue"
+import { ref, watch, onBeforeUnmount } from "vue"
+import { X, UploadCloud, UserPlus, Fingerprint, Mail, Lock, Shield } from 'lucide-vue-next'
 
 const props = defineProps({
     show: Boolean
@@ -18,32 +19,29 @@ const form = ref({
 
 const fileInput = ref(null)
 
+/* ================= FILE HANDLER ================= */
 const handleFile = (file) => {
     if (!file || !file.type.startsWith("image/")) return
+    if (form.value.avatarPreview) URL.revokeObjectURL(form.value.avatarPreview)
 
     form.value.avatar = file
     form.value.avatarPreview = URL.createObjectURL(file)
 }
 
-const onFileChange = (e) => {
-    const file = e.target.files[0]
-    handleFile(file)
-}
-
-const onDrop = (e) => {
-    const file = e.dataTransfer.files[0]
-    handleFile(file)
-}
+const onFileChange = (e) => handleFile(e.target.files?.[0])
+const onDrop = (e) => handleFile(e.dataTransfer.files?.[0])
 
 const removeAvatar = () => {
+    if (form.value.avatarPreview) URL.revokeObjectURL(form.value.avatarPreview)
     form.value.avatar = null
     form.value.avatarPreview = null
-    fileInput.value.value = ""
+    if (fileInput.value) fileInput.value.value = ""
 }
 
+/* ================= SUBMIT ================= */
 const handleSubmit = () => {
     if (!form.value.username || !form.value.email || !form.value.password) {
-        alert("กรุณากรอกข้อมูลให้ครบ")
+        alert("CRITICAL: DATA INCOMPLETE")
         return
     }
 
@@ -52,93 +50,151 @@ const handleSubmit = () => {
     fd.append("email", form.value.email)
     fd.append("password", form.value.password)
     fd.append("role", form.value.role)
-    if (form.value.avatar) {
-        fd.append("avatar", form.value.avatar)
-    }
+    if (form.value.avatar) fd.append("avatar", form.value.avatar)
 
     emit("submit", fd)
-    emit("close")
 }
 
 watch(() => props.show, (val) => {
     if (val) {
-        form.value = {
-            username: "",
-            email: "",
-            password: "",
-            role: "BUYER",
-            avatar: null,
-            avatarPreview: null
-        }
+        form.value = { username: "", email: "", password: "", role: "BUYER", avatar: null, avatarPreview: null }
     }
+})
+
+onBeforeUnmount(() => {
+    if (form.value.avatarPreview) URL.revokeObjectURL(form.value.avatarPreview)
 })
 </script>
 
 <template>
-    <div v-if="show" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-        @click.self="$emit('close')">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
+    <Transition name="modal-fade">
+        <div v-if="show" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <div class="absolute inset-0 bg-[#050505]/80 backdrop-blur-md" @click="$emit('close')"></div>
 
-            <!-- Header -->
-            <div class="px-6 py-4 border-b flex justify-between items-center">
-                <h2 class="text-lg font-semibold">➕ Create User</h2>
-                <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600">✕</button>
-            </div>
+            <div
+                class="relative w-full max-w-lg bg-[#0a0a0b] border border-white/10 rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden">
 
-            <!-- Body -->
-            <div class="p-6 space-y-4">
+                <div class="px-10 pt-10 pb-6 flex justify-between items-center border-b border-white/5">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-blue-600/10 rounded-xl">
+                            <UserPlus class="text-blue-500" :size="24" />
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black italic tracking-tighter uppercase">Enroll Identity</h2>
+                            <p class="text-[9px] font-bold text-zinc-500 tracking-[0.3em] uppercase">Security Protocol
+                                v4.0</p>
+                        </div>
+                    </div>
+                    <button @click="$emit('close')"
+                        class="p-2 hover:bg-white/5 rounded-full text-zinc-500 transition-colors">
+                        <X :size="20" />
+                    </button>
+                </div>
 
-                <!-- Avatar Upload -->
-                <div class="border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition
-                           hover:border-indigo-500" @click="fileInput.click()" @dragover.prevent
-                    @drop.prevent="onDrop">
-                    <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileChange" />
+                <div class="p-10 space-y-8">
 
-                    <div v-if="!form.avatarPreview" class="text-sm text-gray-400">
-                        ลากรูปมาวางที่นี่ หรือคลิกเพื่อเลือกรูป
+                    <div class="flex justify-center">
+                        <div class="relative group w-40 h-40 border-2 border-dashed border-zinc-800 rounded-[2rem] flex items-center justify-center transition-all hover:border-blue-500/50 hover:bg-blue-500/5 cursor-pointer overflow-hidden"
+                            @click="fileInput.click()" @dragover.prevent @drop.prevent="onDrop">
+                            <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileChange" />
+
+                            <div v-if="!form.avatarPreview"
+                                class="flex flex-col items-center gap-2 text-zinc-600 group-hover:text-blue-400 transition-colors">
+                                <UploadCloud :size="32" stroke-width="1.5" />
+                                <span class="text-[9px] font-black uppercase tracking-widest italic">Identity
+                                    Scan</span>
+                            </div>
+
+                            <template v-else>
+                                <img :src="form.avatarPreview" class="w-full h-full object-cover rounded-[1.8rem]" />
+                                <div
+                                    class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <button @click.stop="removeAvatar"
+                                        class="p-3 bg-rose-500 text-white rounded-2xl shadow-xl transform scale-75 group-hover:scale-100 transition-transform">
+                                        <X :size="20" stroke-width="3" />
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
                     </div>
 
-                    <div v-else class="relative inline-block">
-                        <img :src="form.avatarPreview" class="w-32 h-32 object-cover rounded-full border shadow" />
-                        <button @click.stop="removeAvatar"
-                            class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs">
-                            ✕
-                        </button>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <Fingerprint class="input-icon" :size="18" />
+                            <input v-model="form.username" placeholder="ASSIGN USERNAME" class="cyber-input" />
+                        </div>
+
+                        <div class="input-group">
+                            <Mail class="input-icon" :size="18" />
+                            <input v-model="form.email" type="email" placeholder="COMM CHANNEL (EMAIL)"
+                                class="cyber-input" />
+                        </div>
+
+                        <div class="input-group">
+                            <Lock class="input-icon" :size="18" />
+                            <input v-model="form.password" type="password" placeholder="ENCRYPTION KEY (PASSWORD)"
+                                class="cyber-input" />
+                        </div>
+
+                        <div class="input-group">
+                            <Shield class="input-icon" :size="18" />
+                            <select v-model="form.role" class="cyber-input appearance-none">
+                                <option value="ADMIN">ADMINISTRATOR</option>
+                                <option value="SELLER">SELLER UNIT</option>
+                                <option value="BUYER">CITIZEN (BUYER)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <input v-model="form.username" placeholder="Username" class="input" />
-                <input v-model="form.email" type="email" placeholder="Email" class="input" />
-                <input v-model="form.password" type="password" placeholder="Password" class="input" />
-
-                <select v-model="form.role" class="input">
-                    <option value="ADMIN">Administrator</option>
-                    <option value="SELLER">Seller</option>
-                    <option value="BUYER">Buyer</option>
-                </select>
-            </div>
-
-            <!-- Footer -->
-            <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-                <button @click="$emit('close')" class="btn-secondary">Cancel</button>
-                <button @click="handleSubmit" class="btn-primary">Create</button>
+                <div class="px-10 py-8 bg-white/[0.02] border-t border-white/5 flex gap-4">
+                    <button @click="$emit('close')"
+                        class="flex-1 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-white hover:bg-white/5 transition-all">
+                        Abort
+                    </button>
+                    <button @click="handleSubmit"
+                        class="flex-[2] px-8 py-4 bg-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_10px_30px_-5px_rgba(37,99,235,0.4)] hover:bg-white hover:text-black transition-all">
+                        Authorize Identity
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </Transition>
 </template>
 
 <style scoped>
 @import "tailwindcss";
 
-.input {
-    @apply w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-indigo-500;
+.input-group {
+    @apply relative flex items-center;
 }
 
-.btn-primary {
-    @apply px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700;
+.input-icon {
+    @apply absolute left-6 text-zinc-600 transition-colors;
 }
 
-.btn-secondary {
-    @apply px-4 py-2 text-gray-600 hover:text-gray-800;
+.input-group:focus-within .input-icon {
+    @apply text-blue-500;
+}
+
+.cyber-input {
+    @apply w-full text-black bg-black border border-white/5 rounded-2xl py-5 pl-14 pr-6 text-[10px] font-black tracking-widest uppercase outline-none focus:border-blue-500/50 focus:bg-blue-500/5 transition-all placeholder:text-zinc-700;
+}
+
+/* Transitions */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-fade-enter-from,
+s .modal-fade-leave-to {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+}
+
+/* Custom Scrollbar for Select */
+select option {
+    @apply bg-[#0a0a0b] text-black;
 }
 </style>

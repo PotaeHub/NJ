@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { auth } from '../middleware/auth.middleware.js'
-import { adminCancelOrder, adminCompleteOrder, adminCreateCategory, adminDeleteCategory, adminGetAllCategories, adminGetCategoryById, adminGetOrderById, adminGetOrders, adminUpdateCategory, adminUpdateStatus, confirmPayment, createGame, createUser, deleteGame, deleteUser, getAdminDashboard, getAllGames, getOrders, getUsers, orderMy, toggleBanUser, updateGame, updateRole, updateUser } from '../controller/Admin.controller.js'
+import { adminApprovePayment, adminCancelOrder, adminCompleteOrder, adminCreateCategory, adminDeleteCategory, adminGetAllCategories, adminGetCategoryById, adminGetOrderById, adminGetOrders, adminUpdateCategory, adminUpdateStatus, createGame, createUser, deleteGame, deleteUser, getAdminDashboard, getAllGames, getOrders, getUsers, orderMy, toggleBanUser, updateGame, updateRole, updateUser } from '../controller/Admin.controller.js'
 import { Roles } from '../middleware/checkRole.js'
 import { uploadGameMedia } from '../middleware/upload.middleware.js'
 const router = Router()
@@ -60,5 +60,11 @@ router.delete(
     auth,
     Roles('ADMIN'),
     adminDeleteCategory
+)
+router.post(
+    "/admin/approve",
+    auth,
+    Roles("ADMIN"),
+    adminApprovePayment
 )
 export default router

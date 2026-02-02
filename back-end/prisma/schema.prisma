@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
   password  String
-  role      Role     @default(BUYER)
+  role      Role      @default(BUYER)
   avatar    String?
-  games     Game[]   @relation("SellerGames")
-  orders    Order[]  @relation("BuyerOrders")
+  games     Game[]    @relation("SellerGames")
+  orders    Order[]   @relation("BuyerOrders")
   tokens    Token[]
   reviews   Review[]
-  banned    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  banned    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  libraries Library[]
 }
 
 model Token {
@@ -52,6 +53,7 @@ model Game {
   gameMedias GameMedia[]
   orderItems OrderItem[]
   reviews    Review[]
+  libraries  Library[]
 }
 
 model GameMedia {
@@ -79,8 +81,10 @@ model Order {
   buyer      User        @relation("BuyerOrders", fields: [buyerId], references: [id])
   totalPrice Float
   status     OrderStatus @default(PENDING)
-  items      OrderItem[] 
+  items      OrderItem[]
   createdAt  DateTime    @default(now())
+  libraries  Library[]
+  payments   Payment[]
 }
 
 model OrderItem {
@@ -106,6 +110,43 @@ model Review {
   @@unique([userId, gameId])
 }
 
+model Library {
+  id      Int @id @default(autoincrement())
+  userId  Int
+  gameId  Int
+  orderId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  game  Game  @relation(fields: [gameId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, gameId])
+}
+
+model Payment {
+  id      Int           @id @default(autoincrement())
+  orderId Int
+  amount  Float
+  method  PaymentMethod @default(PROMPTPAY)
+
+  status PaymentStatus @default(PENDING)
+
+  ref        String?
+  slipUrl    String?
+  slipHash   String? @unique
+  ocrText    Json?
+  matchScore Int?
+
+  paidAt       DateTime?
+  approvedAt   DateTime?
+  autoApproved Boolean   @default(false)
+
+  order     Order    @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+}
+
 /**
  * ENUMS
  */
@@ -113,6 +154,17 @@ enum Role {
   ADMIN
   SELLER
   BUYER
+}
+
+enum PaymentMethod {
+  PROMPTPAY
+}
+
+enum PaymentStatus {
+  PENDING
+  WAITING_APPROVAL
+  SUCCESS
+  REJECTED
 }
 
 enum TokenType {

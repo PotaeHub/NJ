@@ -1,194 +1,243 @@
 <template>
-    <div class="min-h-screen bg-white text-zinc-900 pb-20 selection:bg-black/10">
+    <div class="min-h-screen bg-[#0a0a0b] text-white pb-32 selection:bg-blue-500/30 overflow-x-hidden">
 
-        <div v-if="game" class="max-w-7xl mx-auto px-6 pt-10">
+        <div
+            class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-600/10 blur-[120px] pointer-events-none">
+        </div>
 
-            <!-- Breadcrumb -->
-            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500 mb-6">
-                <RouterLink to="/" class="hover:text-black transition-colors">Store</RouterLink>
-                <span>/</span>
-                <span class="text-black">{{ game.title }}</span>
+        <div v-if="game" class="relative max-w-7xl mx-auto px-6 pt-12 animate-page-in">
+
+            <div class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-10">
+                <RouterLink to="/" class="hover:text-blue-400 transition-colors">Store</RouterLink>
+                <span class="text-zinc-800">/</span>
+                <span class="text-zinc-300">{{ game.title }}</span>
             </div>
 
-            <!-- GRID -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-                <!-- LEFT : MEDIA -->
-                <div class="lg:col-span-2 space-y-4">
+                <div class="lg:col-span-2 space-y-6">
 
-                    <!-- Main Media -->
                     <div
-                        class="relative aspect-video overflow-hidden rounded-3xl bg-zinc-100 border border-zinc-200 shadow-xl">
-                        <Transition name="fade" mode="out-in">
+                        class="relative aspect-video overflow-hidden rounded-[40px] bg-black border border-white/5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7)] group">
+                        <Transition name="media-fade" mode="out-in">
                             <video v-if="mainMedia?.type === 'VIDEO'" :key="mainMedia.id" :src="backend + mainMedia.url"
                                 controls autoplay muted playsinline class="w-full h-full object-contain bg-black" />
+
                             <img v-else-if="mainMedia" :key="mainMedia.id" :src="backend + mainMedia.url"
-                                class="w-full h-full object-cover" />
+                                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
                         </Transition>
 
                         <div v-if="mainMedia?.type === 'VIDEO'"
-                            class="absolute top-4 left-4 bg-black text-white text-[10px] font-black px-2 py-1 rounded uppercase">
-                            ตัวอย่าง
+                            class="absolute top-6 left-6 bg-blue-600 text-white text-[9px] font-black px-4 py-1.5 rounded-full tracking-[0.2em] shadow-lg">
+                            OFFICIAL TRAILER
                         </div>
                     </div>
 
-                    <!-- Thumbnails -->
-                    <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+                    <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
                         <div v-for="media in game.gameMedias" :key="media.id" @click="mainMedia = media" :class="[
-                            'relative min-w-[120px] h-20 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border-2',
+                            'relative min-w-[160px] aspect-video rounded-[20px] overflow-hidden cursor-pointer transition-all duration-500 border-2 shadow-lg',
                             mainMedia?.id === media.id
-                                ? 'border-black scale-95'
-                                : 'border-transparent opacity-60 hover:opacity-100'
+                                ? 'border-blue-500 scale-95 shadow-blue-500/20 opacity-100'
+                                : 'border-white/5 opacity-40 hover:opacity-100 hover:-translate-y-1'
                         ]">
-                            <!-- VIDEO -->
+
                             <video v-if="media.type === 'VIDEO'" :src="backend + media.url" muted loop
                                 preload="metadata" playsinline class="w-full h-full object-cover"
                                 @mouseenter="$event.target.play()" @mouseleave="$event.target.pause()" />
 
-                            <!-- IMAGE -->
                             <img v-else :src="backend + media.url" class="w-full h-full object-cover" />
 
-                            <!-- Play Icon -->
                             <div v-if="media.type === 'VIDEO'"
-                                class="absolute inset-0 flex items-center justify-center bg-black/30 text-white pointer-events-none">
-                                ▶
+                                class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border border-white/30 text-xs">
+                                    ▶
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- RIGHT : INFO PANEL -->
-                <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-8">
 
-                    <!-- Buy Box -->
-                    <div class="bg-white rounded-3xl p-8 border border-zinc-200 shadow-lg">
+                    <div
+                        class="bg-white/[0.03] backdrop-blur-3xl rounded-[40px] p-10 border border-white/10 shadow-2xl relative overflow-hidden group">
 
-                        <h1 class="text-4xl font-black text-black tracking-tight mb-2">
+                        <div
+                            class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 blur-[60px] group-hover:bg-blue-600/20 transition-all duration-700">
+                        </div>
+
+                        <h1 class="text-4xl font-black tracking-tighter leading-[0.9] mb-4 italic uppercase">
                             {{ game.title }}
                         </h1>
 
-                        <div class="flex items-center gap-2 mb-6">
+                        <div class="flex items-center gap-3 mb-10">
                             <div
-                                class="w-6 h-6 rounded-full bg-zinc-200 flex items-center justify-center text-[10px] text-zinc-600">
-                                👤
+                                class="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-500 flex items-center justify-center text-[10px] font-bold shadow-inner uppercase">
+                                {{ game.seller.username.charAt(0) }}
                             </div>
-                            <p class="text-sm font-bold text-zinc-600">
-                                {{ game.seller.username }}
-                            </p>
+                            <span class="text-xs font-black text-zinc-400 tracking-widest uppercase">{{
+                                game.seller.username }}</span>
                         </div>
 
-                        <div class="space-y-1 mb-8">
-                            <span class="text-xs font-black text-zinc-500 uppercase tracking-widest">
-                                Base Game Price
-                            </span>
-                            <p class="text-5xl font-black text-black tracking-tight">
-                                ฿{{ game.price.toLocaleString() }}
+                        <div class="mb-10 space-y-1">
+                            <p class="text-[10px] font-black tracking-[0.3em] uppercase text-zinc-500">Digital License
                             </p>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-6xl font-black tracking-tighter italic">฿{{
+                                    game.price.toLocaleString() }}</span>
+                                <span class="text-sm font-bold text-zinc-500">THB</span>
+                            </div>
                         </div>
 
                         <button v-if="!owned" @click="buy"
-                            class="w-full bg-black hover:bg-zinc-800 py-5 rounded-2xl font-black text-white text-lg transition-all active:scale-95">
-                            เพิ่มลงตะกร้าสินค้า
+                            class="group relative w-full bg-white text-black py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all hover:bg-blue-500 hover:text-white active:scale-95 shadow-[0_20px_40px_-10px_rgba(255,255,255,0.1)] hover:shadow-blue-500/40">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                เพิ่มลงในรถเข็น
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </span>
                         </button>
 
                         <div v-else
-                            class="w-full bg-zinc-100 border border-zinc-300 py-5 rounded-2xl font-black text-zinc-700 text-center">
-                            ✔ เป็นเจ้าของแล้ว
+                            class="w-full bg-emerald-500/10 border border-emerald-500/30 py-6 rounded-2xl font-black text-emerald-400 text-center text-[10px] tracking-[0.2em] uppercase">
+                            ✔ เป็นเจ้าของแล้วในคลังเกม
                         </div>
                     </div>
 
-                    <!-- Info -->
-                    <div class="bg-white rounded-3xl p-6 border border-zinc-200 space-y-4 text-xs font-bold">
-                        <div class="flex justify-between border-b border-zinc-200 pb-2">
-                            <span class="text-zinc-500 uppercase">วันที่วางจำหน่าย</span>
-                            <span class="text-zinc-700">
-                                {{ new Date(game.createdAt).toLocaleDateString('th-TH') }}
-                            </span>
+                    <div
+                        class="bg-white/[0.02] rounded-[30px] p-8 border border-white/5 text-[11px] font-black tracking-widest uppercase space-y-5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-zinc-600 italic">Release</span>
+                            <span class="text-zinc-300">{{ new Date(game.createdAt).toLocaleDateString('th-TH')
+                                }}</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-zinc-500 uppercase">นักพัฒนา</span>
-                            <span class="text-zinc-700">{{ game.seller.username }}</span>
+                        <div class="flex justify-between items-center">
+                            <span class="text-zinc-600 italic">Platform</span>
+                            <span class="text-zinc-300 bg-white/5 px-2 py-1 rounded">PC Digital</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Description -->
-            <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-white rounded-3xl p-10 border border-zinc-200">
-                    <h2 class="text-xl font-black text-black mb-6 uppercase tracking-tight">
-                        เกี่ยวกับเกมนี้
+            <div class="mt-20 relative">
+                <div class="absolute top-0 left-0 w-24 h-1 bg-blue-600"></div>
+                <div class="bg-white/[0.02] rounded-[40px] p-12 border border-white/5 mt-8">
+                    <h2 class="text-2xl font-black tracking-tighter italic uppercase mb-8 flex items-center gap-4">
+                        รายละเอียดเกม <span class="text-zinc-800 text-4xl leading-none">/</span>
                     </h2>
-                    <p class="text-zinc-700 leading-relaxed text-lg">
+                    <p class="text-lg leading-[1.8] text-zinc-400 font-medium max-w-4xl whitespace-pre-line">
                         {{ game.description }}
                     </p>
                 </div>
             </div>
 
-            <!-- Reviews -->
-            <div class="mt-12">
-                <div class="bg-white rounded-3xl p-10 border border-zinc-200">
-                    <h2 class="text-2xl font-black text-black mb-8 tracking-tight">
-                        USER REVIEWS
-                    </h2>
+            <div class="mt-20">
+                <div class="flex items-center justify-between mb-12">
+                    <h2 class="text-3xl font-black tracking-tighter italic uppercase">User Reviews</h2>
+                    <div class="h-[1px] flex-grow mx-8 bg-white/5"></div>
+                </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div v-for="review in game.reviews" :key="review.id"
-                            class="bg-zinc-50 p-6 rounded-3xl border border-zinc-200">
-                            <p class="font-black text-black">
-                                {{ review.user.username }}
-                            </p>
-                            <p class="text-zinc-600 text-sm italic mt-2">
-                                "{{ review.comment }}"
-                            </p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div v-for="review in game.reviews" :key="review.id"
+                        class="p-8 rounded-[30px] bg-white/[0.02] border border-white/5 hover:border-blue-500/30 transition-colors group">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div
+                                class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs group-hover:bg-blue-600 transition-colors">
+                                {{ review.user.username.charAt(0).toUpperCase() }}
+                            </div>
+                            <div>
+                                <p class="font-black text-xs uppercase tracking-widest">{{ review.user.username }}</p>
+                                <p class="text-[10px] text-zinc-600 uppercase font-black tracking-widest mt-0.5">
+                                    Recommended</p>
+                            </div>
                         </div>
+                        <p class="text-zinc-400 italic font-medium leading-relaxed">
+                            "{{ review.comment }}"
+                        </p>
+                    </div>
 
-                        <div v-if="game.reviews.length === 0"
-                            class="col-span-full py-10 text-center text-zinc-500 font-bold uppercase">
-                            ยังไม่มีรีวิว
-                        </div>
+                    <div v-if="game.reviews.length === 0"
+                        class="col-span-full text-center py-20 bg-white/[0.01] rounded-[40px] border border-dashed border-white/10">
+                        <p class="text-zinc-600 font-black uppercase tracking-[0.5em] text-xs">ยังไม่มีรีวิวจากผู้ใช้งาน
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Loading -->
-        <div v-else class="flex flex-col items-center justify-center h-[80vh] gap-4">
-            <div class="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-            <p class="text-black font-black uppercase tracking-widest text-xs">
-                Loading Assets
+        <div v-else class="flex flex-col items-center justify-center h-[90vh] gap-8">
+            <div class="relative w-20 h-20">
+                <div class="absolute inset-0 border-[3px] border-white/5 rounded-full"></div>
+                <div
+                    class="absolute inset-0 border-[3px] border-blue-500 border-t-transparent rounded-full animate-spin">
+                </div>
+            </div>
+            <p class="text-[10px] font-black tracking-[1em] uppercase text-blue-500/50 animate-pulse">Synchronizing Data
             </p>
         </div>
     </div>
 </template>
 
-
 <style scoped>
 @import "tailwindcss";
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
+/* Page Fade-in Animation */
+.animate-page-in {
+    animation: fadeInSlide 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
 }
 
-.fade-enter-from,
-.fade-leave-to {
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+        filter: blur(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Media Player Transition */
+.media-fade-enter-active,
+.media-fade-leave-active {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.media-fade-enter-from {
     opacity: 0;
+    transform: scale(1.05);
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-    height: 4px;
+.media-fade-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #000;
-    border-radius: 10px;
+/* Utility Styles */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+h1,
+h2 {
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 </style>
 
-
 <script setup>
-// ... (Script คงเดิมจากที่คุณเขียนไว้ แค่เปลี่ยน UI) ...
+// Logic ทั้งหมดของคุณคงเดิม ไม่มีการแก้ไขแม้แต่ตัวเดียว
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
