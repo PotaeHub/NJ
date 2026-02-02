@@ -26,6 +26,8 @@ import GameDetail from '../pages/GameDetail.vue'
 import BuyerCart from '../components/Home/BuyerCart.vue'
 import GamesList from '../pages/GamesList.vue'
 import AdminCategories from '../pages/Admin/AdminCategories.vue'
+import PaymentPage from '../pages/payment/PaymentPage.vue'
+import BuyerLibrary from '../pages/buyer/BuyerLibrary.vue'
 
 const routes = [
     {
@@ -69,7 +71,6 @@ const routes = [
         ]
     },
 
-    /* ================= BUYER ================= */
     {
         path: '/buyer',
         component: BuyerLayout,
@@ -78,7 +79,20 @@ const routes = [
             { path: 'home', component: BuyerHome },
             { path: 'games', component: BuyerCart },
             { path: 'orders', component: BuyerOrders },
-            { path: 'profile', component: BuyerProfile }
+            { path: 'profile', component: BuyerProfile },
+
+            {
+                path: 'payment/:orderId',
+                name: 'buyer-payment',
+                component: PaymentPage,
+                props: true
+            },
+
+            {
+                path: 'library',
+                component: BuyerLibrary,
+                meta: { requiresAuth: true }
+            }
         ]
     }
 ]
@@ -89,24 +103,35 @@ const router = createRouter({
 })
 
 /* ================= GUARD ================= */
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const auth = useAuthStore()
 
-    // ต้อง login
+    // 🔐 ต้อง login
     if (to.meta.requiresAuth && !auth.token) {
         return next('/login')
     }
 
-    // guest only
+    // 👤 guest only
     if (to.meta.guest && auth.token) {
         if (auth.user.role === 'ADMIN') return next('/admin/dashboard')
         if (auth.user.role === 'BUYER') return next('/buyer/home')
         return next('/')
     }
 
-    // role check
+    // 🎭 role check
     if (to.meta.role && auth.user?.role !== to.meta.role) {
         return next('/')
+    }
+
+    // 👑 ownership check (ใช้เฉพาะ route ที่มี gameId)
+    if (to.meta.requiresOwnership) {
+        try {
+            const gameId = to.params.gameId
+            if (!gameId) throw new Error("no gameId")
+            await api.get(`/buyer/ownership/${gameId}`)
+        } catch {
+            return next('/buyer/orders')
+        }
     }
 
     next()

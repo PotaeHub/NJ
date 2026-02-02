@@ -2,6 +2,7 @@ import prisma from "../config/client.js";
 import { deleteFile } from "../utils/file.js";
 import bcrypt from "bcryptjs";
 import path from "path"
+import fs from 'fs'
 export const createGame = async (req, res) => {
     try {
         let {
@@ -171,33 +172,70 @@ export const updateGame = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
-export const deleteGame = async (req, res) => {
+
+const deleteFileSafe = (filePath) => {
     try {
-        const { id } = req.params
-
-        const medias = await prisma.gameMedia.findMany({
-            where: { gameId: Number(id) }
-        })
-
-        for (const m of medias) {
-            deleteFile(path.join(process.cwd(), m.url))
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath)
         }
-
-        await prisma.gameMedia.deleteMany({
-            where: { gameId: Number(id) }
-        })
-
-        await prisma.game.delete({
-            where: { id: Number(id) }
-        })
-
-        res.json({ message: "Game deleted" })
     } catch (err) {
-        console.error(err)
-        res.status(500).json({ message: err.message })
+        console.warn('Delete file failed:', filePath)
     }
 }
 
+export const deleteGame = async (req, res) => {
+    const gameId = Number(req.params.id)
+
+    try {
+        await prisma.$transaction(async (tx) => {
+
+            /* =========================
+               1. Load medias
+            ========================= */
+            const medias = await tx.gameMedia.findMany({
+                where: { gameId }
+            })
+
+            /* =========================
+               2. Delete media files
+            ========================= */
+            for (const media of medias) {
+                const fullPath = path.join(process.cwd(), media.url)
+                deleteFileSafe(fullPath)
+            }
+
+            /* =========================
+               3. Delete relations
+            ========================= */
+
+            // ตัวอย่างตารางลูก (ลบเท่าที่มีใน schema จริง)
+            await tx.gameMedia.deleteMany({ where: { gameId } })
+            await tx.orderItem?.deleteMany?.({ where: { gameId } })
+            await tx.review?.deleteMany?.({ where: { gameId } })
+            await tx.gameCategory?.deleteMany?.({ where: { gameId } })
+            await tx.gameTag?.deleteMany?.({ where: { gameId } })
+
+            /* =========================
+               4. Delete game
+            ========================= */
+            await tx.game.delete({
+                where: { id: gameId }
+            })
+        })
+
+        res.json({
+            success: true,
+            message: 'Game and all related data deleted'
+        })
+
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+}
 // Dashboard 
 export const getAdminDashboard = async (req, res) => {
     try {
@@ -441,21 +479,6 @@ export const getOrders = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
-export const confirmPayment = async (req, res) => {
-    try {
-        const { id } = req.params
-
-        const order = await prisma.order.update({
-            where: { id: Number(id) },
-            data: { status: "PAID" }
-        })
-
-        res.json(order)
-    } catch (err) {
-        console.log(err.message)
-        res.status(500).json({ message: err.message })
-    }
-}
 export const orderMy = async (req, res) => {
     try {
         const orders = await prisma.order.findMany({
@@ -597,6 +620,7 @@ export const deleteUser = async (req, res) => {
     res.json({ message: "User deleted" })
 }
 // Order
+
 export const adminGetOrders = async (req, res) => {
     try {
         const orders = await prisma.order.findMany({
@@ -614,15 +638,13 @@ export const adminGetOrders = async (req, res) => {
                             select: {
                                 id: true,
                                 title: true,
-
+                                price: true
                             }
                         }
                     }
                 }
             },
-            orderBy: {
-                createdAt: "desc"
-            }
+            orderBy: { createdAt: "desc" }
         })
 
         const result = orders.map(order => ({
@@ -631,7 +653,6 @@ export const adminGetOrders = async (req, res) => {
         }))
 
         res.status(200).json(result)
-
     } catch (error) {
         console.error("adminGetOrders error:", error)
         res.status(500).json({ message: "Failed to load orders" })
@@ -645,11 +666,21 @@ export const adminGetOrderById = async (req, res) => {
             where: { id },
             include: {
                 buyer: {
-                    select: { username: true }
+                    select: {
+                        id: true,
+                        username: true,
+                        email: true
+                    }
                 },
                 items: {
                     include: {
-                        game: { select: { title: true } }
+                        game: {
+                            select: {
+                                id: true,
+                                title: true,
+                                price: true
+                            }
+                        }
                     }
                 }
             }
@@ -659,7 +690,10 @@ export const adminGetOrderById = async (req, res) => {
             return res.status(404).json({ message: "Order not found" })
         }
 
-        res.json(order)
+        res.json({
+            ...order,
+            totalPrice: Number(order.totalPrice)
+        })
     } catch (err) {
         console.error(err)
         res.status(500).json({ message: "Failed to load order" })
@@ -669,8 +703,8 @@ export const adminUpdateStatus = async (req, res) => {
     const id = Number(req.params.id)
     const { status } = req.body
 
-    const allow = ["PENDING", "PAID", "COMPLETED", "CANCELLED"]
-    if (!allow.includes(status)) {
+    const allowStatus = ["PENDING", "PAID", "COMPLETED", "CANCELLED"]
+    if (!allowStatus.includes(status)) {
         return res.status(400).json({ message: "Invalid status" })
     }
 
@@ -687,46 +721,74 @@ export const adminUpdateStatus = async (req, res) => {
     }
 }
 export const adminCompleteOrder = async (req, res) => {
-    const id = Number(req.params.id)
+    const orderId = Number(req.params.id)
 
     try {
-        await prisma.$transaction(async (tx) => {
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: {
+                items: true // ✅ ใช้ items ถูกแล้ว
+            }
+        })
 
-            const order = await tx.order.findUnique({
-                where: { id },
-                include: { items: true }
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "ไม่พบคำสั่งซื้อ"
+            })
+        }
+
+        if (order.status !== "PAID") {
+            return res.status(400).json({
+                success: false,
+                message: "ออเดอร์ยังไม่อยู่ในสถานะ PAID"
+            })
+        }
+
+        await prisma.$transaction(async (tx) => {
+            // 1️⃣ เปลี่ยนสถานะ order
+            await tx.order.update({
+                where: { id: orderId },
+                data: {
+                    status: "COMPLETED"
+                }
             })
 
-            if (!order) throw new Error("Order not found")
-            if (order.status !== "PAID") {
-                throw new Error("Order is not PAID")
-            }
-
-            // ลด stock เกม
+            // 2️⃣ เพิ่มเกมเข้า Library
             for (const item of order.items) {
-                await tx.game.update({
-                    where: { id: item.gameId },
-                    data: {
-                        stock: { decrement: item.quantity }
+                await tx.library.upsert({
+                    where: {
+                        userId_gameId: {
+                            userId: order.buyerId, // ✅ สำคัญมาก
+                            gameId: item.gameId
+                        }
+                    },
+                    update: {},
+                    create: {
+                        userId: order.buyerId,  // ✅ ใส่ตรง ๆ
+                        gameId: item.gameId,
+                        orderId: order.id
                     }
                 })
             }
-
-            // เปลี่ยนสถานะ
-            await tx.order.update({
-                where: { id },
-                data: { status: "COMPLETED" }
-            })
         })
 
-        res.json({ message: "Order completed" })
+        res.json({
+            success: true,
+            message: "Order COMPLETED และเพิ่มเกมเข้า Library แล้ว"
+        })
     } catch (err) {
-        console.error(err)
-        res.status(400).json({
-            message: err.message || "Complete order failed"
+        console.error("adminCompleteOrder error:", err)
+        res.status(500).json({
+            success: false,
+            message: "Complete order failed"
         })
     }
 }
+
+
+
+
 export const adminCancelOrder = async (req, res) => {
     const id = Number(req.params.id)
 
@@ -900,6 +962,58 @@ export const adminDeleteCategory = async (req, res) => {
             success: false,
             message: "Server error"
         })
+    }
+}
+// Payment
+export const adminApprovePayment = async (req, res) => {
+    try {
+        const { paymentId } = req.body
+
+        const payment = await prisma.payment.findFirst({
+            where: {
+                id: Number(paymentId),
+                status: "WAITING_APPROVAL"
+            },
+            include: {
+                order: { include: { items: true } }
+            }
+        })
+
+        if (!payment) {
+            return res.status(404).json({ message: "ไม่พบ Payment ที่รอตรวจสอบ" })
+        }
+
+        await prisma.$transaction(async (tx) => {
+            await tx.payment.update({
+                where: { id: payment.id },
+                data: {
+                    status: "SUCCESS",
+                    paidAt: new Date(),
+                    approvedByAdmin: true
+                }
+            })
+
+            await tx.order.update({
+                where: { id: payment.orderId },
+                data: { status: "PAID" }
+            })
+
+            for (const item of payment.order.items) {
+                await tx.library.create({
+                    data: {
+                        userId: payment.order.buyerId,
+                        gameId: item.gameId,
+                        orderId: payment.orderId
+                    }
+                })
+            }
+        })
+
+        res.json({ message: "Admin อนุมัติสำเร็จ" })
+    }
+    catch (err) {
+        console.error(err)
+        res.status(500).json({ message: "Admin approve ล้มเหลว" })
     }
 }
 

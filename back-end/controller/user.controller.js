@@ -29,3 +29,66 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
+export const getMyLibrary = async (req, res) => {
+    try {
+        const userId = req.user.id
+
+        const libraries = await prisma.library.findMany({
+            where: {
+                userId
+            },
+            include: {
+                game: {
+                    include: {
+                        gameMedias: true,
+                        seller: {
+                            select: {
+                                id: true,
+                                username: true
+                            }
+                        }
+                    }
+                },
+                order: {
+                    select: {
+                        id: true,
+                        createdAt: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        })
+
+        res.json({
+            success: true,
+            data: libraries
+        })
+    } catch (err) {
+        console.error("getMyLibrary error:", err)
+        res.status(500).json({
+            success: false,
+            message: "โหลดคลังเกมไม่สำเร็จ"
+        })
+    }
+}
+export const checkOwnership = async (req, res) => {
+    const userId = req.user.id
+    const gameId = Number(req.params.gameId)
+
+    const owned = await prisma.library.findFirst({
+        where: {
+            userId,
+            gameId
+        }
+    })
+
+    if (!owned) {
+        return res.status(403).json({
+            message: "คุณยังไม่ได้เป็นเจ้าของเกมนี้"
+        })
+    }
+
+    res.json({ owned: true })
+}

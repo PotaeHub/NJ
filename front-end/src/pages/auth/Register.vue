@@ -29,70 +29,73 @@ const submit = async () => {
 
 <template>
     <div
-        class="min-h-screen bg-[#FDFDFD] flex items-center justify-center p-6 relative overflow-hidden font-sans selection:bg-black selection:text-white">
+        class="min-h-screen bg-[#0a0a0b] flex items-center justify-center p-6 relative overflow-hidden font-sans selection:bg-blue-500/30">
 
-        <!-- Background Decorative (Subtle Grey) -->
-        <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-zinc-100/80 blur-[120px] rounded-full">
+        <div
+            class="fixed top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full pointer-events-none">
         </div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-zinc-200/50 blur-[100px] rounded-full">
+        <div
+            class="fixed bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none">
         </div>
 
-        <div class="w-full max-w-[480px] relative">
-            <!-- Main Card Container -->
+        <div class="w-full max-w-[480px] relative animate-in">
             <div
-                class="relative bg-white rounded-[2.5rem] border border-zinc-100 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.1)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_70px_-20px_rgba(0,0,0,0.15)]">
+                class="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-[3rem] blur-2xl opacity-50 transition duration-1000">
+            </div>
 
-                <!-- Progress Bar Loading -->
-                <div v-if="loading" class="absolute top-0 left-0 h-[2px] bg-black animate-[loading_2s_infinite]"></div>
+            <div
+                class="relative bg-white/[0.02] backdrop-blur-3xl rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
 
-                <div class="relative p-10 md:p-12">
-                    <!-- Header Section -->
+                <div v-if="loading"
+                    class="absolute top-0 left-0 h-[3px] w-full bg-blue-500 shadow-[0_0_15px_#3b82f6] animate-pulse">
+                </div>
+
+                <div class="relative p-10 md:p-14">
                     <div class="text-center mb-10">
-                        <div class="inline-block px-4 py-1 rounded-full bg-zinc-50 border border-zinc-200 mb-6">
-                            <span class=" text-zinc-500 uppercase ">ลงทะเบียนผู้ใช้</span>
+                        <div
+                            class="inline-block px-5 py-1.5 rounded-full bg-white/[0.03] border border-white/10 mb-6 backdrop-blur-md">
+                            <span
+                                class="text-[10px] font-black text-blue-400 uppercase tracking-[0.4em] italic">ลงทะเบียนผู้ใช้</span>
                         </div>
-                        <h2 class="text-4xl font-black text-black italic uppercase tracking-tighter">
-                            สร้าง <span class="text-zinc-300 group-hover:text-black transition-colors">บัญชี</span>
+                        <h2 class="text-4xl font-black text-white italic uppercase tracking-tighter">
+                            สร้าง <span class="text-blue-500 drop-shadow-[0_0_15px_rgba(37,99,235,0.3)]">บัญชี</span>
                         </h2>
-                        <div class="h-1 w-12 bg-black mx-auto mt-4 rounded-full"></div>
+                        <div class="h-1 w-12 bg-blue-600 mx-auto mt-5 rounded-full shadow-[0_0_10px_#3b82f6]"></div>
                     </div>
 
-                    <!-- Input Fields -->
                     <div class="grid grid-cols-1 gap-6">
 
-                        <!-- Username -->
-                        <div class="space-y-1.5">
-                            <label class="text-[15px] font-black text-zinc-400 uppercase ml-2">ชื่อผู้ใช้งาน</label>
+                        <div class="space-y-2">
+                            <label
+                                class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] ml-2 italic">ชื่อผู้ใช้งาน</label>
                             <input v-model="username" type="text" placeholder="user-224"
-                                class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                                class="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all placeholder:text-zinc-700 text-sm font-bold tracking-widest" />
                         </div>
 
-                        <!-- Email -->
-                        <div class="space-y-1.5">
-                            <label class=" font-black text-zinc-400   ml-1">Email</label>
+                        <div class="space-y-2">
+                            <label
+                                class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] ml-2 italic">Email</label>
                             <input v-model="email" type="email" placeholder="COMMANDER@NEXUS.ID"
-                                class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                                class="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all placeholder:text-zinc-700 text-sm font-bold tracking-widest" />
                         </div>
 
-                        <!-- Password -->
-                        <div class="space-y-1.5">
-                            <label class=" font-black text-zinc-400 ml-1">Password</label>
+                        <div class="space-y-2">
+                            <label
+                                class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] ml-2 italic">Password</label>
                             <input v-model="password" type="password" placeholder="••••••••"
-                                class="w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-4 text-black outline-none focus:border-black focus:bg-white transition-all placeholder:text-zinc-300 text-sm font-bold tracking-wide" />
+                                class="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-6 py-4 text-white outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all placeholder:text-zinc-700 text-sm font-bold tracking-widest" />
                         </div>
 
-                        <!-- Terms -->
                         <p
-                            class="text-[16px] text-zinc-400 font-bold text-center leading-relaxed px-4 uppercase tracking-tighter">
-                            เมื่อดำเนินการต่อ <span class="text-black">คุณยอมรับข้อกำหนดในการให้บริการ</span> และ
-                            <span class="text-black">นโยบายความเป็นส่วนตัว</span>.
+                            class="text-[11px] text-zinc-500 font-bold text-center leading-relaxed px-4 uppercase tracking-tighter italic">
+                            เมื่อดำเนินการต่อ <span class="text-zinc-200">คุณยอมรับข้อกำหนดในการให้บริการ</span> และ
+                            <span class="text-zinc-200">นโยบายความเป็นส่วนตัว</span>.
                         </p>
 
-                        <!-- Submit Button -->
                         <button @click="submit" :disabled="loading"
-                            class="w-full bg-black hover:bg-zinc-800 disabled:bg-zinc-200 disabled:text-zinc-400 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] transition-all shadow-xl shadow-black/10 active:scale-[0.98] group mt-2">
+                            class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-black py-5 rounded-2xl uppercase tracking-[0.2em] transition-all shadow-[0_15px_30px_-5px_rgba(37,99,235,0.4)] active:scale-[0.98] mt-2 overflow-hidden group">
 
-                            <span v-if="loading" class="flex items-center justify-center gap-3 italic">
+                            <span v-if="loading" class="flex items-center justify-center gap-3 italic text-sm">
                                 <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                         stroke-width="4" fill="none"></circle>
@@ -102,16 +105,17 @@ const submit = async () => {
                                 </svg>
                                 Syncing...
                             </span>
-                            <span v-else class="flex items-center justify-center gap-2 italic">
-                                สมัครสมาชิก ➜
+                            <span v-else class="flex items-center justify-center gap-2 italic text-sm">
+                                สมัครสมาชิก <span
+                                    class="group-hover:translate-x-2 transition-transform duration-500 text-lg">➜</span>
                             </span>
                         </button>
 
-                        <!-- Login Link -->
-                        <p class="text-center text-[11px] text-zinc-400 font-bold mt-4 uppercase tracking-widest">
+                        <p
+                            class="text-center text-[10px] text-zinc-500 font-black mt-4 uppercase tracking-[0.2em] italic">
                             มีบัญชีอยู๋แล้ว ? ไปที่
                             <router-link to="/login"
-                                class="text-black hover:text-zinc-600 transition-colors ml-1 underline decoration-black/20 underline-offset-4 decoration-2">
+                                class="text-blue-500 hover:text-blue-400 transition-colors ml-1 underline underline-offset-4 decoration-blue-500/30 decoration-2">
                                 ล็อกอิน
                             </router-link>
                         </p>
@@ -120,11 +124,36 @@ const submit = async () => {
             </div>
         </div>
 
+        <div class="absolute bottom-10 left-0 right-0 flex justify-center items-center gap-8 opacity-20">
+            <span class="text-[10px] font-black text-white uppercase tracking-[0.4em] italic">Nexus.ID Protocol</span>
+            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_#3b82f6]"></div>
+            <span class="text-[10px] font-black text-white uppercase tracking-[0.4em] italic">Status: Secure
+                Access</span>
+        </div>
     </div>
 </template>
 
 <style scoped>
 @import "tailwindcss";
+
+/* 🚀 Entrance Animation */
+.animate-in {
+    animation: registerReveal 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+@keyframes registerReveal {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+        filter: blur(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
 
 @keyframes loading {
     0% {
@@ -143,10 +172,10 @@ const submit = async () => {
     }
 }
 
-/* ปรับแต่ง Scrollbar และ Autofill ให้เข้ากับธีมขาวดำ */
+/* Custom Autofill Styles for Dark Mode */
 input:-webkit-autofill {
-    -webkit-text-fill-color: black;
-    -webkit-box-shadow: 0 0 0px 1000px #F9FAFB inset;
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px #161618 inset;
     transition: background-color 5000s ease-in-out 0s;
 }
 </style>
